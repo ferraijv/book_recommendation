@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Recommendation App</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <h1>Book Recommendation App</h1>
+    <form method="post">
+        <label for="preferences">Enter your preferences:</label><br>
+        <textarea id="preferences" name="preferences" rows="4" cols="50" placeholder="e.g., genre, themes, or favorite books"></textarea><br>
+        <button type="submit">Get Recommendations</button>
+    </form>
+
+    {% if recommendations %}
+        <h2>Recommended Books:</h2>
+        <div>{{ recommendations|safe }}</div>
+    {% endif %}
+</body>
+</html>
