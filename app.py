@@ -42,15 +42,8 @@ def get_secrets():
 # Example usage (in your main app code):
 secrets = get_secrets()
 
-# Replace 'your-secret-name' with the name of your secret in Secrets Manager
-secret_name = "openai_api_key"
-region_name = "us-east-1"  # Adjust the region if necessary
-
-# Get the secret
-secret = get_secret(secret_name, region_name)
-
 # Extract the OpenAI API key from the secret
-openai_api_key = secret['api_key']
+openai_api_key = secrets['api_key']
 
 client = OpenAI(
     # defaults to os.environ.get("OPENAI_API_KEY")
