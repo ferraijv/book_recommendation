@@ -11,8 +11,25 @@
     <form method="post">
         <label for="preferences">Enter your preferences:</label><br>
         <textarea id="preferences" name="preferences" rows="4" cols="50" placeholder="e.g., genre, themes, or favorite books"></textarea><br>
+
+        <label for="obscurity">Obscurity Level:</label>
+        <input type="range" id="obscurity" name="obscurity" min="1" max="10" value="5">
+        <span id="obscurity-value"></span> <br>
+
+        <label for="MBTI">MBTI:</label>
+        <textarea id=MBTI" name="MBTI" rows="4" cols="10" placeholder="Myers Briggs Personality Indicator"></textarea><br>
+
         <button type="submit">Get Recommendations</button>
     </form>
+
+    <script>
+    const obscuritySlider = document.getElementById('obscurity');
+    const obscurityValue = document.getElementById('obscurity-value');
+
+    obscuritySlider.addEventListener('input', () => {
+        obscurityValue.textContent = obscuritySlider.value;
+    });
+    </script>
 
     {% if recommendations %}
         <h2>Recommended Books:</h2>

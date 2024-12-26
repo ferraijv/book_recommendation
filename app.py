@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect, url_for
 import openai
 import os
 import boto3
@@ -53,22 +53,47 @@ client = OpenAI(
 # Initialize Flask app
 app = Flask(__name__)
 
+def create_prompt(obscurity_level, user_input, mbti):
+    prompt = f"""
+    "MBTI": {mbti},
+    "Obscurity_level": {obscurity_level},
+    "Preferences: {user_input} 
+    """
+
+    return prompt
+
+def set_obscurity(obscurity_level):
+    # Adjust the prompt based on obscurity_level
+    if obscurity_level <= 3:
+        prompt_obscurity_modifier = "The user wants highly popular books "
+    elif obscurity_level >= 8:
+        prompt_obscurity_modifier = "The user wants rare or obscure books "
+    else:
+        prompt_obscurity_modifier = "Any level of obscurity is fine"
+        
+    return prompt_obscurity_modifier
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     recommendations = None
     if request.method == "POST":
         user_input = request.form.get("preferences")
+        mbti = request.form.get("MBTI")
+        obscurity_level = int(request.form.get("obscurity", 5))  # Get obscurity, default to 5
         if user_input:
+            user_input = user_input[:500]  # Limit input to avoid large charges
+            user_profile = create_prompt(obscurity_level, user_input, mbti)
+
             try:
                 # Call ChatGPT for book recommendations
                 response = client.chat.completions.create(
                     model="gpt-3.5-turbo",
                     messages=[
-                        {"role": "system", "content": "You are a helpful assistant providing book recommendations."},
-                        {"role": "user", "content": f"Recommend books based on these preferences: {user_input}"}
+                        {"role": "system", "content": "You are a helpful assistant providing book recommendations. Return list book recommendations based on the user profiles."},
+                        {"role": "user", "content": f"User profile: {user_profile}"}
                     ]
                 )
-                logging.info(response)
+                logging.warning(response)
                 recommendations = response.choices[0].message.content.strip()
             except Exception as e:
                 recommendations = f"Error: {e}"
