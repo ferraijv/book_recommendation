@@ -6,21 +6,41 @@ import json
 from openai import OpenAI
 import logging
 
-def get_secret(secret_name, region_name="us-east-1"):
-    """
-    Fetches a secret from AWS Secrets Manager.
-    """
-    # Create a Secrets Manager client
-    client = boto3.client("secretsmanager", region_name=region_name)
-
+def get_secrets():
+    """Retrieves secrets based on the environment."""
     try:
-        # Get the secret value
-        response = client.get_secret_value(SecretId=secret_name)
-        # Secrets Manager returns a string, parse if necessary
-        secret = response.get("SecretString")
-        return json.loads(secret) if secret else None
+        if "RENDER" in os.environ:  # Check if running on Render
+            logging.info("Running on Render, using secret files")
+            secrets_path = "/etc/secrets/secrets.json"
+            try:
+                with open(secrets_path, "r") as f:
+                    secrets = json.load(f)
+                    return secrets
+            except (FileNotFoundError, json.JSONDecodeError) as e:
+                logging.error(f"Error reading Render secrets: {e}")
+                return None
+        else:  # Running locally
+            logging.info("Running locally, using AWS Secrets Manager")
+            secret_name = "openai_api_key"  # Replace with your secret name
+            region_name = os.environ.get("AWS_REGION", "us-east-1") # get region from env if available otherwise default
+            try:
+                session = boto3.session.Session()
+                client = session.client(
+                    service_name='secretsmanager',
+                    region_name=region_name
+                )
+                get_secret_value_response = client.get_secret_value(SecretId=secret_name)
+                secret = get_secret_value_response['SecretString']
+                return json.loads(secret)
+            except Exception as e:
+                logging.error(f"Error retrieving AWS secret: {e}")
+                return None
     except Exception as e:
-        raise Exception(f"Error retrieving secret: {e}")
+        logging.exception("A top level exception occurred")
+        return None
+
+# Example usage (in your main app code):
+secrets = get_secrets()
 
 # Replace 'your-secret-name' with the name of your secret in Secrets Manager
 secret_name = "openai_api_key"
