@@ -11,7 +11,7 @@ def get_secrets():
     try:
         if "RENDER" in os.environ:  # Check if running on Render
             logging.info("Running on Render, using secret files")
-            secrets_path = "/etc/secrets/secrets.json"
+            secrets_path = "/etc/secrets/openai.json"
             try:
                 with open(secrets_path, "r") as f:
                     secrets = json.load(f)
