@@ -76,7 +76,7 @@ def get_amazon_search_link(title, author):
     """Generate a basic Amazon search link using the book title and author."""
     base_url = "https://www.amazon.com/s"
     query = f"{title} {author}".replace(" ", "+")
-    return f"{base_url}?k={query}"
+    return f"{base_url}?k={query}&tag=bookrecom0e1f-20"  # TODO parameterize the tag
 
 
 # Example usage (in your main app code):
