@@ -192,10 +192,10 @@ def reader_profile_form():
 @app.route("/generate-reader-profile", methods=["POST"])
 def generate_reader_profile():
     # Get user input from the form
-    genres = request.form.get("genres")
-    reading_frequency = request.form.get("reading_frequency")
-    format = request.form.get("format")
-    reading_goals = request.form.get("reading_goals")
+    genres = request.form.get("genres")[:500]
+    reading_frequency = request.form.get("reading_frequency")[:500]
+    format = request.form.get("format")[:500]
+    reading_goals = request.form.get("reading_goals")[:500]
 
     # Prepare the ChatGPT prompt
     prompt = f"""
@@ -240,7 +240,8 @@ def generate_reader_profile():
 
         book_details = get_book_metadata(title, author)
         book_details["amazon_link"] = get_amazon_search_link(title, author)
-        if book_details:
+        book_details["ga_event"] = f"Outbound Link: {title}"
+        if book_details.get("title"):
             all_book_metadata.append(book_details)
         logging.warning(book_details)
 

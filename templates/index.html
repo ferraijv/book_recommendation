@@ -10,6 +10,22 @@
 
       gtag('config', 'G-M07VZC8BC6');
     </script>
+        <!-- Event listener for outbound links -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        document.body.addEventListener('click', function (event) {
+          const target = event.target.closest('[data-ga-event]');
+          if (target) {
+            const label = target.getAttribute('data-ga-event');
+            gtag('event', 'click', {
+              'event_category': 'Outbound Link',
+              'event_label': label,
+              'transport_type': 'beacon'
+            });
+          }
+        });
+      });
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book Recommendation App</title>
@@ -25,16 +41,17 @@
     <p class="loading-text" id="loadingText">Fetching your recommendations...</p>
     <h1>BookFinder AI</h1>
     <form method="post">
-        <label for="preferences">Enter your preferences:</label><br>
-        <textarea id="preferences" name="preferences" rows="4" cols="50" placeholder="e.g., genre, themes, or favorite books"></textarea><br>
+        <label for="preferences">What are you looking for?:</label><br>
+        <textarea id="preferences" name="preferences" rows="4" cols="50" placeholder="e.g., genre, themes, topic, or favorite books"></textarea><br>
 
-        <label for="obscurity">Obscurity Level:</label>
-        <input type="range" id="obscurity" name="obscurity" min="1" max="10" value="5">
-        <span id="obscurity-value"></span> <br>
-
-        <label for="MBTI">MBTI:</label>
-        <textarea id="MBTI" name="MBTI" rows="4" cols="10" placeholder="Myers Briggs Personality Indicator"></textarea><br>
-
+        <div class="tooltip-container">
+            <label for="obscurity">Obscurity Level:</label>
+            <input type="range" id="obscurity" name="obscurity" min="1" max="10" value="5">
+            <span id="obscurity-value"></span>
+            <div class="tooltip">Adjust the slider to set how obscure you want your book recommendations to be. Lower values favor popular books, while higher values favor rare finds.</div>
+        </div>
+        <br>
+        <br>
         <button type="submit">Get Recommendations</button>
     </form>
 
@@ -54,7 +71,7 @@
                 <div class="book">
                     <h3>{{ book.title }}</h3>
                     {% if book.thumbnail and book.amazon_link %}
-                        <a href="{{ book.amazon_link }}" target="_blank">
+                        <a href="{{ book.amazon_link }}" target="_blank" data-ga-event="{{ book.ga_event }}">
                             <img src="{{ book.thumbnail }}" alt="Book cover">
                         </a>
                     {% elif book.thumbnail %}

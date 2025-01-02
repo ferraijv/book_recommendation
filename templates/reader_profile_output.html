@@ -10,6 +10,22 @@
 
       gtag('config', 'G-M07VZC8BC6');
     </script>
+            <!-- Event listener for outbound links -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        document.body.addEventListener('click', function (event) {
+          const target = event.target.closest('[data-ga-event]');
+          if (target) {
+            const label = target.getAttribute('data-ga-event');
+            gtag('event', 'click', {
+              'event_category': 'Outbound Link',
+              'event_label': label,
+              'transport_type': 'beacon'
+            });
+          }
+        });
+      });
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book Recommendation App</title>
@@ -43,7 +59,7 @@
                 <div class="book">
                     <h3>{{ book.title }}</h3>
                     {% if book.thumbnail and book.amazon_link %}
-                        <a href="{{ book.amazon_link }}" target="_blank">
+                        <a href="{{ book.amazon_link }}" target="_blank" data-ga-event="{{ book.ga_event }}">
                             <img src="{{ book.thumbnail }}" alt="Book cover">
                         </a>
                     {% elif book.thumbnail %}
