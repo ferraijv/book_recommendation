@@ -6,6 +6,7 @@ import json
 from openai import OpenAI
 import logging
 import requests
+from markdown2 import markdown
 
 def get_secrets(secret_name) -> dict:
     """Retrieves secrets based on the environment."""
@@ -141,7 +142,7 @@ def index():
                 logging.warning(response)
                 recommendations = response.choices[0].message.content.strip()
 
-                response =  client.chat.completions.create(
+                response = client.chat.completions.create(
                     model="gpt-3.5-turbo",
                     messages=[
                         {"role": "system", "content": """
@@ -178,6 +179,54 @@ def index():
 @app.route("/about")
 def about():
     return render_template("about.html")
+
+@app.route("/reader-profile", methods=["GET"])
+def reader_profile_form():
+    return render_template("reader_profile_input.html")
+
+@app.route("/generate-reader-profile", methods=["POST"])
+def generate_reader_profile():
+    # Get user input from the form
+    genres = request.form.get("genres")
+    reading_frequency = request.form.get("reading_frequency")
+    format = request.form.get("format")
+    reading_goals = request.form.get("reading_goals")
+
+    # Prepare the ChatGPT prompt
+    prompt = f"""
+    Analyze the following reading preferences and habits, and create a fun, sharable "Reader Personality" profile:
+    - Favorite Genres: {genres}
+    - Reading Frequency: {reading_frequency}
+    - Preferred Format: {format}
+    - Reading Goals: {reading_goals}
+
+    Categorize the user's "Reader Personality" (e.g., "The Book Adventurer", "The Cozy Reader", etc.), describe their traits, and suggest books or themes that align with their profile.
+    """
+
+    try:
+        # Call the ChatGPT API
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": """Analyze the following reading preferences and habits, and create a "Reader Personality" profile. Return the output in structured Markdown format like this:
+
+                                                **Reader Personality Profile**: <Personality Name>  
+                                                **Traits**: <Description of personality traits>  
+                                                **Suggested Books/Themes**:  
+                                                1. <Book 1>  
+                                                2. <Book 2>  
+                                                3. <Book 3>  
+                                                """},
+                {"role": "user", "content": prompt}
+            ]
+        )
+        analysis = response.choices[0].message.content
+        analysis_html = markdown(analysis)  # Converts Markdown to HTML
+    except Exception as e:
+        analysis = f"Error generating profile: {str(e)}"
+
+    # Render the output page with the analysis
+    return render_template("reader_profile_output.html", analysis_html=analysis_html, shareable_text=analysis)
 
 if __name__ == "__main__":
     app.run(debug=True)

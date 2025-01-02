@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M07VZC8BC6"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-M07VZC8BC6');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Recommendation App</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="navbar">
+        <a href="/">Home</a>
+        <a href="/reader-profile">Reader Profile</a>
+        <a href="/about">About</a>
+    </div>
+    <div class="reader-profile">
+        <h2>Your Reader Personality</h2>
+        <div class="profile-content">
+            {{ analysis_html | safe }}
+        </div>
+        <div class="share-buttons">
+            <p>Share your Reader Personality:</p>
+            <a href="https://twitter.com/intent/tweet?text={{ shareable_text | urlencode }}" target="_blank">
+                <button>Share on Twitter</button>
+            </a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u={{ url_for('generate_reader_profile', _external=True) }}" target="_blank">
+                <button>Share on Facebook</button>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

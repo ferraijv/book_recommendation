@@ -19,6 +19,7 @@ itsdangerous==2.2.0
 Jinja2==3.1.5
 jiter==0.8.2
 jmespath==1.0.1
+markdown2==2.5.2
 MarkupSafe==3.0.2
 openai==1.58.1
 packaging==24.2
