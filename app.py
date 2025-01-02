@@ -116,6 +116,25 @@ def set_obscurity(obscurity_level):
         
     return prompt_obscurity_modifier
 
+def identify_books(text):
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": """
+            You are a helpful assistant providing book recommendations. For each recommendation, Provide the book recommendations in the following JSON format:
+            [
+              {"title": "<book title>", "author": "<author name>"},
+              {"title": "<book title>", "author": "<author name>"},
+              ...
+            ]"""},
+            {"role": "user", "content": f"Identify the books mentioned below and return results: {text}"}
+        ]
+    )
+
+    books = json.loads(response.choices[0].message.content)
+
+    return books
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     recommendations = None
@@ -142,21 +161,7 @@ def index():
                 logging.warning(response)
                 recommendations = response.choices[0].message.content.strip()
 
-                response = client.chat.completions.create(
-                    model="gpt-3.5-turbo",
-                    messages=[
-                        {"role": "system", "content": """
-                        You are a helpful assistant providing book recommendations. For each recommendation, Provide the book recommendations in the following JSON format:
-                        [
-                          {"title": "<book title>", "author": "<author name>"},
-                          {"title": "<book title>", "author": "<author name>"},
-                          ...
-                        ]"""},
-                        {"role": "user", "content": f"Identify the books mentioned below and return results: {recommendations}"}
-                    ]
-                )
-
-                books = json.loads(response.choices[0].message.content)
+                books = identify_books(recommendations)
 
                 logging.warning(books)
 
@@ -202,7 +207,7 @@ def generate_reader_profile():
 
     Categorize the user's "Reader Personality" (e.g., "The Book Adventurer", "The Cozy Reader", etc.), describe their traits, and suggest books or themes that align with their profile.
     """
-
+    all_book_metadata = []
     try:
         # Call the ChatGPT API
         response = client.chat.completions.create(
@@ -224,9 +229,28 @@ def generate_reader_profile():
         analysis_html = markdown(analysis)  # Converts Markdown to HTML
     except Exception as e:
         analysis = f"Error generating profile: {str(e)}"
+        analysis_html = None
+
+    books = identify_books(analysis)
+
+    for book in books:
+        logging.warning(book)
+        title = book["title"]
+        author = book["author"]
+
+        book_details = get_book_metadata(title, author)
+        book_details["amazon_link"] = get_amazon_search_link(title, author)
+        if book_details:
+            all_book_metadata.append(book_details)
+        logging.warning(book_details)
 
     # Render the output page with the analysis
-    return render_template("reader_profile_output.html", analysis_html=analysis_html, shareable_text=analysis)
+    return render_template(
+        "reader_profile_output.html",
+        analysis_html=analysis_html,
+        shareable_text=analysis,
+        all_book_metadata=all_book_metadata
+    )
 
 if __name__ == "__main__":
     app.run(debug=True)
