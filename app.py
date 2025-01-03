@@ -112,13 +112,13 @@ def set_obscurity(obscurity_level):
     elif obscurity_level >= 8:
         prompt_obscurity_modifier = "The user wants rare or obscure books "
     else:
-        prompt_obscurity_modifier = "Any level of obscurity is fine"
+        prompt_obscurity_modifier = ""
         
     return prompt_obscurity_modifier
 
 def identify_books(text):
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": """
             You are a helpful assistant providing book recommendations. For each recommendation, Provide the book recommendations in the following JSON format:
@@ -130,8 +130,9 @@ def identify_books(text):
             {"role": "user", "content": f"Identify the books mentioned below and return results: {text}"}
         ]
     )
-
-    books = json.loads(response.choices[0].message.content)
+    logging.warning(response)
+    response_content = response.choices[0].message.content
+    books = json.loads(response_content.strip("```json").strip())
 
     return books
 
@@ -152,7 +153,7 @@ def index():
             try:
                 # Call ChatGPT for book recommendations
                 response = client.chat.completions.create(
-                    model="gpt-3.5-turbo",
+                    model="gpt-4o-mini",
                     messages=[
                         {"role": "system", "content": "You are a helpful assistant providing book recommendations. Return list book recommendations based on the user profiles. Return 5 book recommendations"},
                         {"role": "user", "content": f"User profile: {user_profile}"}
@@ -179,7 +180,7 @@ def index():
             except Exception as e:
                 recommendations = f"Error: {e}"
 
-    return render_template("index.html", all_book_metadata=all_book_metadata)
+    return render_template("index.html", all_book_metadata=all_book_metadata, recommendations=recommendations)
 
 @app.route("/about")
 def about():
@@ -193,27 +194,34 @@ def reader_profile_form():
 def generate_reader_profile():
     # Get user input from the form
     genres = request.form.get("genres")[:500]
+    favorite_books = request.form.get("favorite_books")[:500]
     reading_frequency = request.form.get("reading_frequency")[:500]
     format = request.form.get("format")[:500]
     reading_goals = request.form.get("reading_goals")[:500]
+    themes_to_avoid = request.form.get("themes_to_avoid")[:500]
+    mbti = request.form.get("mbti")  # Optional field
 
     # Prepare the ChatGPT prompt
     prompt = f"""
     Analyze the following reading preferences and habits, and create a fun, sharable "Reader Personality" profile:
     - Favorite Genres: {genres}
+    - Favorite Books: {favorite_books}
     - Reading Frequency: {reading_frequency}
     - Preferred Format: {format}
     - Reading Goals: {reading_goals}
+    - Themes to avoid {themes_to_avoid if themes_to_avoid else "None"}
+    - MBTI: {mbti if mbti else "Not provided"}
 
     Categorize the user's "Reader Personality" (e.g., "The Book Adventurer", "The Cozy Reader", etc.), describe their traits, and suggest books or themes that align with their profile.
     """
+    logging.warning(prompt)
     all_book_metadata = []
     try:
         # Call the ChatGPT API
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": """Analyze the following reading preferences and habits, and create a "Reader Personality" profile. Return the output in structured Markdown format like this:
+                {"role": "system", "content": """Analyze the following reading preferences and habits, and create a "Reader Personality" profile. Don't include books they've already read in their suggestions. Return the output in structured Markdown format like this:
 
                                                 **Reader Personality Profile**: <Personality Name>  
                                                 **Traits**: <Description of personality traits>  
@@ -221,12 +229,16 @@ def generate_reader_profile():
                                                 1. <Book 1>  
                                                 2. <Book 2>  
                                                 3. <Book 3>  
+                                                4. <Book 4>
+                                                5. <Book 5>
                                                 """},
                 {"role": "user", "content": prompt}
             ]
         )
-        analysis = response.choices[0].message.content
+        analysis = response.choices[0].message.content.strip()
+        logging.warning(analysis)
         analysis_html = markdown(analysis)  # Converts Markdown to HTML
+        logging.warning(analysis_html)
     except Exception as e:
         analysis = f"Error generating profile: {str(e)}"
         analysis_html = None
