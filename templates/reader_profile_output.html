@@ -1,47 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-        <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M07VZC8BC6"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+{% extends "base.html" %}
 
-      gtag('config', 'G-M07VZC8BC6');
-    </script>
-            <!-- Event listener for outbound links -->
-    <script>
-      document.addEventListener('DOMContentLoaded', function () {
-        document.body.addEventListener('click', function (event) {
-          const target = event.target.closest('[data-ga-event]');
-          if (target) {
-            const label = target.getAttribute('data-ga-event');
-            gtag('event', 'click', {
-              'event_category': 'Outbound Link',
-              'event_label': label,
-              'transport_type': 'beacon'
-            });
-          }
-        });
-      });
-    </script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Recommendation App</title>
-    <link rel="stylesheet" href="/static/styles.css">
-</head>
-<body>
-    <div class="navbar">
-        <a href="/">Home</a>
-        <a href="/reader-profile">Reader Profile</a>
-        <a href="/about">About</a>
-    </div>
-    <div class="reader-profile">
+{% block title %}BookFinder AI - Reader Profile Input{% endblock %}
+
+{% block content %}
         <h2>Your Reader Personality</h2>
         <div class="profile-content">
             {{ analysis_html | safe }}
         </div>
+        <div class="share-section">
+            <h3>Share Your Reader Personality</h3>
+            <textarea id="shareableText" readonly rows="6" style="width: 100%; margin-bottom: 10px;">
+        {{ shareable_text.strip() }}
+            </textarea>
+            <button id="copyButton">Copy to Clipboard</button>
+        </div>
+        <script>
+        document.getElementById("copyButton").addEventListener("click", function() {
+            const textArea = document.getElementById("shareableText");
+            textArea.select();
+            document.execCommand("copy");
+            alert("Reader Personality copied to clipboard!");
+        });
+        </script>
+
         <div class="share-buttons">
             <p>Share your Reader Personality:</p>
             <a href="https://twitter.com/intent/tweet?text={{ shareable_text | urlencode }}" target="_blank">
@@ -75,10 +56,4 @@
             {% endfor %}
         </div>
     {% endif %}
-<footer>
-  <p style="font-size: 0.9em; color: gray; text-align: center; margin-top: 20px;">
-    Disclaimer: As an Amazon Associate, I earn from qualifying purchases. This site contains affiliate links, which means I may earn a commission if you click through and make a purchase. The recommendations on this site are generated dynamically and are not influenced by affiliate income.
-  </p>
-</footer>
-</body>
-</html>
+{% endblock %}

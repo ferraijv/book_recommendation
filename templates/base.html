@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M07VZC8BC6"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-M07VZC8BC6');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}My Blog{% endblock %}</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <!-- Shared Navigation -->
+    <div class="navbar">
+        <a href="/">Home</a>
+        <a href="/reader-profile">Reader Profile</a>
+        <a href="/about">About</a>
+        <a href="/blog">Blog</a>
+    </div>
+
+    <!-- Main Content Block -->
+    <div class="container">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <!-- Shared Footer -->
+    <footer>
+        <p style="font-size: 0.9em; color: gray; text-align: center; margin-top: 20px;">
+            Disclaimer: As an Amazon Associate, I earn from qualifying purchases. The recommendations on this site are generated dynamically and are not influenced by affiliate income.
+        </p>
+    </footer>
+</body>
+</html>

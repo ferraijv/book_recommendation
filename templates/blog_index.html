@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Home - My Blog{% endblock %}
+
+{% block content %}
+    <h1>Blog</h1>
+    <ul>
+        {% for post in posts %}
+        <li>
+            <a href="/blog/{{ post.metadata.title.replace(' ', '-').lower() }}">
+                {{ post.metadata['title'] }} - {{ post.metadata['date'] }}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

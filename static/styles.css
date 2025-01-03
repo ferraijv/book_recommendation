@@ -32,24 +32,30 @@ h2 {
 
 .navbar {
     background-color: #007bff;
-    overflow: hidden;
     display: flex;
     justify-content: space-between;
-    padding: 10px 20px;
+    align-items: center;
+    padding: 10px 30px; /* Increased padding for a cleaner look */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Add subtle shadow */
 }
 
 .navbar a {
     color: white;
     text-decoration: none;
-    padding: 14px 20px;
-    font-size: 1rem;
-    display: inline-block;
+    padding: 10px 20px;
+    font-size: 1.2rem; /* Slightly larger font size */
+    border-radius: 5px;
+    transition: background-color 0.3s ease; /* Smooth hover effect */
 }
 
 .navbar a:hover {
-    background-color: #0056b3;
-    border-radius: 5px;
+    background-color: #0056b3; /* Darker hover color */
 }
+
+.navbar a.active {
+    background-color: #0056b3; /* Highlight the active page */
+}
+
 
 .spinner {
     display: none; /* Hidden by default */

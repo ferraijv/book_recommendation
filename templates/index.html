@@ -1,45 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-        <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M07VZC8BC6"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+{% extends "base.html" %}
 
-      gtag('config', 'G-M07VZC8BC6');
-    </script>
-        <!-- Event listener for outbound links -->
-    <script>
-      document.addEventListener('DOMContentLoaded', function () {
-        document.body.addEventListener('click', function (event) {
-          const target = event.target.closest('[data-ga-event]');
-          if (target) {
-            const label = target.getAttribute('data-ga-event');
-            gtag('event', 'click', {
-              'event_category': 'Outbound Link',
-              'event_label': label,
-              'transport_type': 'beacon'
-            });
-          }
-        });
-      });
-    </script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Recommendation App</title>
-    <link rel="stylesheet" href="/static/styles.css">
-</head>
-<body>
-    <div class="navbar">
-        <a href="/">Home</a>
-        <a href="/reader-profile">Reader Profile</a>
-        <a href="/about">About</a>
-    </div>
+{% block title %}Home - Welcome to BookFinder AI{% endblock %}
+
+{% block content %}
+<h1>Welcome to BookFinder AI</h1>
     <div class="spinner" id="loadingSpinner"></div>
     <p class="loading-text" id="loadingText">Fetching your recommendations...</p>
-    <h1>BookFinder AI</h1>
     <form method="post">
         <label for="preferences">What are you looking for?:</label><br>
         <textarea id="preferences" name="preferences" rows="4" cols="50" placeholder="e.g., genre, themes, topic, or favorite books"></textarea><br>
@@ -102,10 +68,4 @@
     });
     </script>
     <br><br>
-<footer>
-  <p style="font-size: 0.9em; color: gray; text-align: center; margin-top: 20px;">
-    Disclaimer: As an Amazon Associate, I earn from qualifying purchases. This site contains affiliate links, which means I may earn a commission if you click through and make a purchase. The recommendations on this site are generated dynamically and are not influenced by affiliate income.
-  </p>
-</footer>
-</body>
-</html>
+{% endblock %}

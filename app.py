@@ -6,7 +6,8 @@ import json
 from openai import OpenAI
 import logging
 import requests
-from markdown2 import markdown
+from markdown2 import markdown, Markdown
+import yaml
 
 def get_secrets(secret_name) -> dict:
     """Retrieves secrets based on the environment."""
@@ -39,7 +40,23 @@ def get_secrets(secret_name) -> dict:
     except Exception as e:
         logging.exception("A top level exception occurred")
         return None
+from flask import Flask, render_template, request, abort
 
+BLOG_DIR = "blog/posts"
+def load_blog_posts():
+    posts = []
+    for filename in os.listdir(BLOG_DIR):
+        if filename.endswith(".md"):
+            with open(os.path.join(BLOG_DIR, filename), "r") as file:
+                content = file.read()
+                if content.startswith("---"):
+                    parts = content.split("---", 2)
+                    metadata = yaml.safe_load(parts[1])
+                    html_content = markdown(parts[2].strip())
+                    posts.append({"metadata": metadata, "content": html_content})
+
+    logging.warning(posts)
+    return sorted(posts, key=lambda x: x["metadata"]["date"], reverse=True)
 def get_book_metadata(title, author):
     """Fetch metadata for a book using Google Books API."""
     api_key = os.getenv("GOOGLE_BOOKS_API_KEY")  # Fetch API key from environment variables
@@ -138,7 +155,7 @@ def identify_books(text):
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    recommendations = None
+    recommendations = ""
     books = None
     book_details = None
     all_book_metadata = []
@@ -245,6 +262,8 @@ def generate_reader_profile():
 
     books = identify_books(analysis)
 
+    shareable_text = analysis
+
     for book in books:
         logging.warning(book)
         title = book["title"]
@@ -261,9 +280,22 @@ def generate_reader_profile():
     return render_template(
         "reader_profile_output.html",
         analysis_html=analysis_html,
-        shareable_text=analysis,
+        shareable_text=shareable_text,
         all_book_metadata=all_book_metadata
     )
+
+@app.route("/blog")
+def blog_index():
+    posts = load_blog_posts()
+    return render_template("blog_index.html", posts=posts)
+
+@app.route("/blog/<post_title>")
+def blog_post(post_title):
+    posts = load_blog_posts()
+    post = next((p for p in posts if p["metadata"]["title"].replace(" ", "-").lower() == post_title.lower()), None)
+    if not post:
+        abort(404)
+    return render_template("blog_post.html", post=post)
 
 if __name__ == "__main__":
     app.run(debug=True)
