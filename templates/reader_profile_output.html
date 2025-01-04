@@ -51,6 +51,7 @@
                     <p><strong>Categories:</strong> {{ book.categories | join(", ") if book.categories else "N/A" }}</p>
                     <p><strong>Published Date:</strong> {{ book.publishedDate or "N/A" }}</p>
                     <p><strong>Page Count:</strong> {{ book.pageCount or "N/A" }}</p>
+                    <a href="{{ book.amazon_link }}" class="buy-button">Buy Now on Amazon</a>
                 </div>
                 <hr>
             {% endfor %}

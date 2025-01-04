@@ -154,3 +154,119 @@ h2 {
         padding: 10px 0; /* Add some padding between links */
     }
 }
+.blog-posts .post {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin: 10px 0;
+    padding: 15px;
+    overflow: hidden;
+}
+
+.blog-posts .post:hover {
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.blog-posts img {
+    border-radius: 5px;
+}
+
+.featured-post img {
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+.hero-banner {
+    background-image: url('/static/images/hero-banner.jpg'); /* Replace with your image */
+    background-size: cover; /* Make the image cover the entire section */
+    background-position: center;
+    height: 400px; /* Adjust height as needed */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    position: relative;
+}
+
+.hero-banner:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Add a dark overlay for better text visibility */
+    z-index: 1;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2; /* Ensure content is above the overlay */
+}
+
+.cta-button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 10px;
+    display: inline-block;
+    font-size: 1.2rem;
+}
+
+.cta-button:hover {
+    background-color: #0056b3;
+}
+@media (max-width: 768px) {
+    .hero-banner {
+        height: 300px;
+    }
+
+    .hero-content h1 {
+        font-size: 1.8rem;
+    }
+
+    .hero-content p {
+        font-size: 1rem;
+    }
+
+    .cta-button {
+        font-size: 1rem;
+        padding: 8px 16px;
+    }
+}
+.hero-content h1 {
+    animation: fadeIn 2s ease-in-out;
+}
+
+.hero-content p {
+    animation: fadeIn 2.5s ease-in-out;
+}
+
+.cta-button {
+    animation: fadeIn 3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.buy-button {
+    background-color: #ff9900;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+}
+.buy-button:hover {
+    background-color: #cc7a00;
+}

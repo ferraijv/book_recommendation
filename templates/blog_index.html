@@ -4,6 +4,16 @@
 
 {% block content %}
     <h1>Blog</h1>
+    <div class="featured-post">
+        <h2>Featured Post</h2>
+        <div class="post">
+            <a href="/blog/top-5-books-about-dreams-you-should-read">
+                <img src="/static/images/cover_photo_dreams.webp" alt="Top 5 Books About Dreams" style="max-width:30%; height:auto;">
+                <h3>Top 5 Books About Dreams You Should Read</h3>
+            </a>
+        </div>
+    </div>
+    <h2>All blog posts</h2>
     <ul>
         {% for post in posts %}
         <li>
