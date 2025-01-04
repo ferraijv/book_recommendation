@@ -143,3 +143,14 @@ h2 {
     opacity: 1;
 }
 
+@media screen and (max-width: 768px) {
+    .navbar {
+        flex-direction: column; /* Stack items vertically */
+        text-align: center; /* Center the text */
+    }
+
+    .navbar a {
+        display: block; /* Make links take full width */
+        padding: 10px 0; /* Add some padding between links */
+    }
+}
