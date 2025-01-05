@@ -14,13 +14,17 @@
         </div>
     </div>
     <h2>All blog posts</h2>
+    <div class="blog-list">
     <ul>
         {% for post in posts %}
-        <li>
+            <div class="blog-post">
+
             <a href="/blog/{{ post.metadata.title.replace(' ', '-').lower() }}">
-                {{ post.metadata['title'] }} - {{ post.metadata['date'] }}
+                <img src={{post.metadata['img']}} alt="Top 5 Books About Dreams" style="max-width:30%; height:auto;">
+                <h3>{{ post.metadata['title'] }}</h3>
             </a>
-        </li>
+            </div>
         {% endfor %}
     </ul>
+        </div>
 {% endblock %}

@@ -4,6 +4,7 @@
 
 {% block content %}
 <h2>Create Your Reader Profile</h2>
+<div class="spinner" id="loadingSpinner"></div>
     <form method="POST" action="/generate-reader-profile">
         <label for="genres">What are your favorite genres? (e.g., mystery, sci-fi, romance)</label><br>
         <textarea id="genres" name="genres" rows="3" placeholder="Type your favorite genres..."></textarea><br><br>
@@ -37,4 +38,13 @@
 
         <button type="submit">Generate My Profile</button>
     </form>
+    <script>
+    const form = document.querySelector("form");
+    const spinner = document.getElementById("loadingSpinner");
+
+    form.addEventListener("submit", () => {
+        spinner.style.display = "block"; // Show the spinner
+        loadingText.style.display = "block"; // Show the loading text
+    });
+    </script>
 {% endblock %}

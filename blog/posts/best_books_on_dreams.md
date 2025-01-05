@@ -1,6 +1,7 @@
 ---
 title: "Top 5 Books About Dreams You Should Read"
 date: "2025-01-03"
+img: https://m.media-amazon.com/images/I/81kCj6fTbhL._SY522_.jpg
 ---
 ![Dreams](/static/images/cover_photo_dreams.webp)
 

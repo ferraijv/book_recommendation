@@ -1,6 +1,7 @@
 ---
 title: "Top 5 Books on the Origins of WWI"
 date: "2025-01-03"
+img: https://m.media-amazon.com/images/I/918p+4UnpsL._SY522_.jpg
 ---
 
 # Top 5 Books on the Origins of World War I
