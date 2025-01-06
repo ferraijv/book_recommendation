@@ -8,6 +8,8 @@ import logging
 import requests
 from markdown2 import markdown, Markdown
 import yaml
+import time
+
 
 def get_secrets(secret_name) -> dict:
     """Retrieves secrets based on the environment."""
@@ -24,7 +26,8 @@ def get_secrets(secret_name) -> dict:
                 return None
         else:  # Running locally
             logging.info("Running locally, using AWS Secrets Manager")
-            region_name = os.environ.get("AWS_REGION", "us-east-1") # get region from env if available otherwise default
+            region_name = os.environ.get("AWS_REGION",
+                                         "us-east-1")  # get region from env if available otherwise default
             try:
                 session = boto3.session.Session()
                 client = session.client(
@@ -40,9 +43,22 @@ def get_secrets(secret_name) -> dict:
     except Exception as e:
         logging.exception("A top level exception occurred")
         return None
+
+
 from flask import Flask, render_template, request, abort
 
 BLOG_DIR = "blog/posts"
+
+CACHE_FILE = "cache.json"
+
+# Load cache from file (if it exists)
+if os.path.exists(CACHE_FILE):
+    with open(CACHE_FILE, "r") as f:
+        cache = json.load(f)
+else:
+    cache = {}
+
+
 def load_blog_posts():
     posts = []
     for filename in os.listdir(BLOG_DIR):
@@ -57,6 +73,7 @@ def load_blog_posts():
 
     logging.warning(posts)
     return sorted(posts, key=lambda x: x["metadata"]["date"], reverse=True)
+
 def get_book_metadata(title, author):
     """Fetch metadata for a book using Google Books API."""
     api_key = os.getenv("GOOGLE_BOOKS_API_KEY")  # Fetch API key from environment variables
@@ -64,6 +81,12 @@ def get_book_metadata(title, author):
 
     # Construct query for title and author
     query = f"intitle:{title}+inauthor:{author}"
+
+    # only make api request if book isn't in cache
+    if cache.get(query):
+        logging.warning(f"Query: {query} found in cache")
+        return cache[query]['metadata']
+
     params = {
         "q": query,
         "key": api_key,
@@ -72,6 +95,7 @@ def get_book_metadata(title, author):
 
     try:
         response = requests.get(base_url, params=params)
+        logging.warning(response.status_code)
         if response.status_code == 200:
             data = response.json()
             if 'items' in data:
@@ -85,10 +109,17 @@ def get_book_metadata(title, author):
                     "pageCount": book.get("pageCount"),
                     "thumbnail": book.get("imageLinks", {}).get("thumbnail")
                 }
+                cache[query] = {
+                    'data': metadata,
+                    'timestamp': time.time()
+                }
+                with open(CACHE_FILE, "w") as f:
+                    json.dump(cache, f)
                 return metadata
         return {"error": "No book data found"}
     except Exception as e:
         return {"error": str(e)}
+
 
 def get_amazon_search_link(title, author):
     """Generate a basic Amazon search link using the book title and author."""
@@ -113,6 +144,7 @@ client = OpenAI(
 # Initialize Flask app
 app = Flask(__name__)
 
+
 def create_prompt(obscurity_level, user_input, mbti):
     prompt = f"""
     "MBTI": {mbti},
@@ -122,6 +154,7 @@ def create_prompt(obscurity_level, user_input, mbti):
 
     return prompt
 
+
 def set_obscurity(obscurity_level):
     # Adjust the prompt based on obscurity_level
     if obscurity_level <= 3:
@@ -130,8 +163,9 @@ def set_obscurity(obscurity_level):
         prompt_obscurity_modifier = "The user wants rare or obscure books "
     else:
         prompt_obscurity_modifier = ""
-        
+
     return prompt_obscurity_modifier
+
 
 def identify_books(text):
     response = client.chat.completions.create(
@@ -153,6 +187,7 @@ def identify_books(text):
 
     return books
 
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     recommendations = ""
@@ -172,7 +207,8 @@ def index():
                 response = client.chat.completions.create(
                     model="gpt-4o-mini",
                     messages=[
-                        {"role": "system", "content": "You are a helpful assistant providing book recommendations. Return list book recommendations based on the user profiles. Return 5 book recommendations"},
+                        {"role": "system",
+                         "content": "You are a helpful assistant providing book recommendations. Return list book recommendations based on the user profiles. Return 5 book recommendations"},
                         {"role": "user", "content": f"User profile: {user_profile}"}
                     ]
                 )
@@ -199,13 +235,16 @@ def index():
 
     return render_template("index.html", all_book_metadata=all_book_metadata, recommendations=recommendations)
 
+
 @app.route("/about")
 def about():
     return render_template("about.html")
 
+
 @app.route("/reader-profile", methods=["GET"])
 def reader_profile_form():
     return render_template("reader_profile_input.html")
+
 
 @app.route("/generate-reader-profile", methods=["POST"])
 def generate_reader_profile():
@@ -284,10 +323,12 @@ def generate_reader_profile():
         all_book_metadata=all_book_metadata
     )
 
+
 @app.route("/blog")
 def blog_index():
     posts = load_blog_posts()
     return render_template("blog_index.html", posts=posts)
+
 
 @app.route("/blog/<post_title>")
 def blog_post(post_title):
@@ -296,6 +337,7 @@ def blog_post(post_title):
     if not post:
         abort(404)
     return render_template("blog_post.html", post=post)
+
 
 if __name__ == "__main__":
     app.run(debug=True)

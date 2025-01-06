@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Book{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="book-header">
+            <div class="book-image">
+                <img src="{{book.image}}" alt="{{book.title}}">
+            </div>
+            <div class="book-details">
+                <div class="book-title">{{book.title}}</div>
+                <div class="book-author">Author: {{book.author}}</div>
+                <div class="book-meta">
+                    <p><strong>ISBN:</strong> {{ISBN}}</p>
+                    <p><strong>Number of Pages:</strong> {{book.page_count}}</p>
+                    <p><strong>Categories:</strong> {{book.categories}}</p>
+                </div>
+            </div>
+        </div>
+        <div class="book-description">
+            <h3>Description:</h3>
+            <p>{{book.description}}</p>
+        </div>
+        <div class="ratings">
+            <p><strong>Ratings:</strong> <span>{{book.ratings_count}}</span> ratings</p>
+            <p><strong>Average Rating:</strong> <span>{{book.average_rating}}</span></p>
+        </div>
+    </div>
+{% endblock %}
