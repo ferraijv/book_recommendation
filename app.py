@@ -74,9 +74,9 @@ def load_blog_posts():
     logging.warning(posts)
     return sorted(posts, key=lambda x: x["metadata"]["date"], reverse=True)
 
-def get_book_metadata(title, author):
+def get_book_metadata(title, author, google_books_api_key):
     """Fetch metadata for a book using Google Books API."""
-    api_key = os.getenv("GOOGLE_BOOKS_API_KEY")  # Fetch API key from environment variables
+    api_key = google_books_api_key  # Fetch API key from environment variables
     base_url = "https://www.googleapis.com/books/v1/volumes"
 
     # Construct query for title and author
@@ -224,7 +224,7 @@ def index():
                     title = book["title"]
                     author = book["author"]
 
-                    book_details = get_book_metadata(title, author)
+                    book_details = get_book_metadata(title, author, google_books_api_key)
                     book_details["amazon_link"] = get_amazon_search_link(title, author)
                     if book_details:
                         all_book_metadata.append(book_details)
