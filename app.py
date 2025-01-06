@@ -49,15 +49,6 @@ from flask import Flask, render_template, request, abort
 
 BLOG_DIR = "blog/posts"
 
-CACHE_FILE = "cache.json"
-
-# Load cache from file (if it exists)
-if os.path.exists(CACHE_FILE):
-    with open(CACHE_FILE, "r") as f:
-        cache = json.load(f)
-else:
-    cache = {}
-
 
 def load_blog_posts():
     posts = []
@@ -82,11 +73,6 @@ def get_book_metadata(title, author, google_books_api_key):
     # Construct query for title and author
     query = f"intitle:{title}+inauthor:{author}"
 
-    # only make api request if book isn't in cache
-    if cache.get(query):
-        logging.warning(f"Query: {query} found in cache")
-        return cache[query]['metadata']
-
     params = {
         "q": query,
         "key": api_key,
@@ -109,12 +95,6 @@ def get_book_metadata(title, author, google_books_api_key):
                     "pageCount": book.get("pageCount"),
                     "thumbnail": book.get("imageLinks", {}).get("thumbnail")
                 }
-                cache[query] = {
-                    'data': metadata,
-                    'timestamp': time.time()
-                }
-                with open(CACHE_FILE, "w") as f:
-                    json.dump(cache, f)
                 return metadata
         return {"error": "No book data found"}
     except Exception as e:
