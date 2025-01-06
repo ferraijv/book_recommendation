@@ -18,11 +18,24 @@
 <body>
     <!-- Shared Navigation -->
     <div class="navbar">
-        <a href="/">Home</a>
-        <a href="/reader-profile">Reader Profile</a>
-        <a href="/about">About</a>
-        <a href="/blog">Blog</a>
+        <a href="/">
+            <img src="/static/images/book_logo.webp" alt="Logo" class="navbar-logo">
+        </a>
+        <button class="hamburger-menu" onclick="toggleNavbar()">☰</button>
+        <div class="navbar-links hidden">
+            <a href="/">Home</a>
+            <a href="/reader-profile">Reader Profile</a>
+            <a href="/about">About</a>
+            <a href="/blog">Blog</a>
+        </div>
     </div>
+    <script>
+    function toggleNavbar() {
+        const navbarLinks = document.querySelector('.navbar-links');
+        navbarLinks.classList.toggle('hidden');
+    }
+    </script>
+
 
     <!-- Main Content Block -->
     <div class="container">

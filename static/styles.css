@@ -1,11 +1,16 @@
 body {
     font-family: Arial, sans-serif;
-    margin: 20px;
+    margin: 0;
     line-height: 1.6;
 }
 
 h1 {
     color: #333;
+    margin: 20px;
+}
+
+img {
+    background: none;
 }
 
 textarea {
@@ -33,34 +38,62 @@ h2 {
 }
 
 .navbar {
+    background-color: #007bff; /* Navbar background color */
+    display: flex; /* Flexbox for layout */
+    justify-content: space-between; /* Distribute space between elements */
+    align-items: center; /* Vertically align items */
+    padding: 10px 10px; /* Add padding for spacing */
+    position: sticky; /* Make the navbar sticky */
+    top: 0; /* Stick to the top of the viewport */
+    z-index: 1000; /* Ensure it stays above other elements */
+    width: 100%; /* Extend the navbar's width to 100% of the viewport */
+    box-sizing: border-box; /* Include padding in the element's total width */
+}
+
+
+.navbar-logo {
+    height: 40px; /* Adjust the size as needed */
+    width: auto;  /* Maintains aspect ratio */
+    margin-right: 10px; /* Adds space between the logo and other elements */
+    border-radius: 5px;
+}
+
+
+.hamburger-menu {
     background-color: #007bff;
+    color: white;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.navbar-links {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 30px; /* Increased padding for a cleaner look */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Add subtle shadow */
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    flex-direction: column;
+    position: absolute;
+    top: 50px;
+    left: 0;
+    width: 100%;
+    background-color: #007bff;
+    padding: 10px 0;
+}
+
+.navbar-links.hidden {
+    display: none;
 }
 
 .navbar a {
     color: white;
     text-decoration: none;
     padding: 10px 20px;
-    font-size: 1.2rem; /* Slightly larger font size */
-    border-radius: 5px;
-    transition: background-color 0.3s ease; /* Smooth hover effect */
+    font-size: 1rem;
 }
 
 .navbar a:hover {
-    background-color: #0056b3; /* Darker hover color */
+    background-color: #0056b3;
+    border-radius: 5px;
 }
 
-.navbar a.active {
-    background-color: #0056b3; /* Highlight the active page */
-}
 
 
 .spinner {
@@ -149,17 +182,6 @@ h2 {
     opacity: 1;
 }
 
-@media screen and (max-width: 768px) {
-    .navbar {
-        flex-direction: column; /* Stack items vertically */
-        text-align: center; /* Center the text */
-    }
-
-    .navbar a {
-        display: block; /* Make links take full width */
-        padding: 10px 0; /* Add some padding between links */
-    }
-}
 .blog-posts .post {
     border: 1px solid #ddd;
     border-radius: 5px;
@@ -184,6 +206,8 @@ h2 {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     background-color: #fff;
     margin-bottom: 20px;
+    margin: 0 auto;
+    width: 95%;
     text-align: center;
 }
 
@@ -308,13 +332,16 @@ h2 {
 .buy-button:hover {
     background-color: #cc7a00;
 }
+.container {
+    justify-content: center; /* Center horizontally */
+}
 form {
     background-color: #f8f9fa;
     border: 1px solid #ddd;
     padding: 20px;
     border-radius: 8px;
     max-width: 600px;
-    margin: 20px auto;
+    margin: 0 auto;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 textarea, input[type="text"] {
@@ -365,6 +392,7 @@ textarea, input[type="text"] {
     margin: auto;
     width: 60%;
     text-align: center;
+    margin-bottom: 20px; /* Add spacing between posts */
 }
 
 .blog-post h3 {

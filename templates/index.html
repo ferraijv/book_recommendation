@@ -5,6 +5,7 @@
 {% block content %}
 <h1>Welcome to BookFinder AI</h1>
     <div class="spinner" id="loadingSpinner"></div>
+    <div class="container">
     <form method="post">
         <label for="preferences">What are you looking for?:</label><br>
         <textarea id="preferences" name="preferences" rows="4" cols="50" placeholder="e.g., genre, themes, topic, or favorite books"></textarea><br>
@@ -19,6 +20,7 @@
         <br>
         <button type="submit">Get Recommendations</button>
     </form>
+    </div>
 
     <script>
     const obscuritySlider = document.getElementById('obscurity');

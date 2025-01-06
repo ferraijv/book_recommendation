@@ -3,10 +3,10 @@ title: "Top 5 Books About Dreams You Should Read"
 date: "2025-01-03"
 img: https://m.media-amazon.com/images/I/81kCj6fTbhL._SY522_.jpg
 ---
-![Dreams](/static/images/cover_photo_dreams.webp)
 
 
 Dreams have fascinated humanity for centuries, offering insights into our subconscious, sparking creativity, and raising profound questions about the human mind. If you’re curious about the world of dreams, here are five incredible books that explore their mysteries.
+
 ---
 
 ### 1. [*The Interpretation of Dreams* by Sigmund Freud](https://amzn.to/4iUUCuV)
