@@ -288,7 +288,7 @@ def generate_reader_profile():
         title = book["title"]
         author = book["author"]
 
-        book_details = get_book_metadata(title, author)
+        book_details = get_book_metadata(title, author, google_books_api_key)
         book_details["amazon_link"] = get_amazon_search_link(title, author)
         book_details["ga_event"] = f"Outbound Link: {title}"
         if book_details.get("title"):
