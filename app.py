@@ -318,6 +318,19 @@ def blog_post_generator():
     for post in posts:
         yield 'blog_post', {'post_title': post["metadata"]["title"].replace(" ", "-").lower()}
 
+
+@sitemap.register_generator
+def static_page_generator():
+    routes = [
+        ('index', {}),  # Root route ("/")
+        ('blog_index', {}),
+        ('about', {}),
+        ('reader_profile_form', {}),
+    ]
+    for route in routes:
+        print(f"Adding static route to sitemap: {route}")
+        yield route
+
 @app.route("/blog/<post_title>")
 def blog_post(post_title):
     posts = load_blog_posts()
