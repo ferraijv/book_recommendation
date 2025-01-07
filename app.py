@@ -9,6 +9,7 @@ import requests
 from markdown2 import markdown, Markdown
 import yaml
 import time
+from flask_sitemap import Sitemap
 
 
 def get_secrets(secret_name) -> dict:
@@ -123,6 +124,8 @@ client = OpenAI(
 
 # Initialize Flask app
 app = Flask(__name__)
+
+sitemap = Sitemap(app=app)
 
 
 def create_prompt(obscurity_level, user_input, mbti):
@@ -309,6 +312,11 @@ def blog_index():
     posts = load_blog_posts()
     return render_template("blog_index.html", posts=posts)
 
+@sitemap.register_generator
+def blog_post_generator():
+    posts = load_blog_posts()
+    for post in posts:
+        yield 'blog_post', {'post_title': post["metadata"]["title"].replace(" ", "-").lower()}
 
 @app.route("/blog/<post_title>")
 def blog_post(post_title):
