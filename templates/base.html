@@ -15,6 +15,7 @@
     <title>{% block title %}My Blog{% endblock %}</title>
     <link rel="stylesheet" href="/static/styles.css">
     <link rel="canonical" href="https://smartbookfinder.com{{ request.path }}" />
+    <link rel="icon" type="image/webp" href="{{ url_for('static', filename='images/flavicon.webp') }}">
 </head>
 <body>
     <!-- Shared Navigation -->
@@ -28,6 +29,7 @@
             <a href="/reader-profile">Reader Profile</a>
             <a href="/about">About</a>
             <a href="/blog">Blog</a>
+            <a href="/community">Community</a>
         </div>
     </div>
     <script>

@@ -326,6 +326,7 @@ def static_page_generator():
         ('blog_index', {}),
         ('about', {}),
         ('reader_profile_form', {}),
+        ('community', {}),
     ]
     for route in routes:
         print(f"Adding static route to sitemap: {route}")
@@ -338,6 +339,10 @@ def blog_post(post_title):
     if not post:
         abort(404)
     return render_template("blog_post.html", post=post)
+
+@app.route("/community")
+def community():
+    return render_template("community.html")
 
 
 if __name__ == "__main__":
