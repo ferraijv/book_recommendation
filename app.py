@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template, redirect, url_for, flash, abort
 import openai
 import os
 import boto3
@@ -10,68 +10,99 @@ from markdown2 import markdown, Markdown
 import yaml
 import time
 from flask_sitemap import Sitemap
-
-
-def get_secrets(secret_name) -> dict:
-    """Retrieves secrets based on the environment."""
-    try:
-        if "RENDER" in os.environ:  # Check if running on Render
-            logging.info("Running on Render, using secret files")
-            secrets_path = f"/etc/secrets/{secret_name}.json"
-            try:
-                with open(secrets_path, "r") as f:
-                    secrets = json.load(f)
-                    return secrets
-            except (FileNotFoundError, json.JSONDecodeError) as e:
-                logging.error(f"Error reading Render secrets: {e}")
-                return None
-        else:  # Running locally
-            logging.info("Running locally, using AWS Secrets Manager")
-            region_name = os.environ.get("AWS_REGION",
-                                         "us-east-1")  # get region from env if available otherwise default
-            try:
-                session = boto3.session.Session()
-                client = session.client(
-                    service_name='secretsmanager',
-                    region_name=region_name
-                )
-                get_secret_value_response = client.get_secret_value(SecretId=secret_name)
-                secret = get_secret_value_response['SecretString']
-                return json.loads(secret)
-            except Exception as e:
-                logging.error(f"Error retrieving AWS secret: {e}")
-                return None
-    except Exception as e:
-        logging.exception("A top level exception occurred")
-        return None
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin, current_user, login_required
+from utils.db_utils import db, User, Book, UserBook
+from contextlib import contextmanager
+from utils.blog_utils import load_blog_posts
+from utils.prompt_utils import set_obscurity, create_prompt
+from utils.config_utils import get_secrets
 
 
 from flask import Flask, render_template, request, abort
 
-BLOG_DIR = "blog/posts"
+
+import logging
 
 
-def load_blog_posts():
-    posts = []
-    for filename in os.listdir(BLOG_DIR):
-        if filename.endswith(".md"):
-            with open(os.path.join(BLOG_DIR, filename), "r") as file:
-                content = file.read()
-                if content.startswith("---"):
-                    parts = content.split("---", 2)
-                    metadata = yaml.safe_load(parts[1])
-                    html_content = markdown(parts[2].strip())
-                    posts.append({"metadata": metadata, "content": html_content})
+def add_or_update_book(data):
+    """
+    Adds a new book or updates an existing book in the database.
 
-    logging.warning(posts)
-    return sorted(posts, key=lambda x: x["metadata"]["date"], reverse=True)
+    Args:
+        data (dict): A dictionary containing book details, including:
+                     - isbn (required)
+                     - title (required)
+                     - author (required)
+                     - description (optional)
+                     - published_date (optional)
+                     - page_count (optional)
+                     - thumbnail (optional)
+
+    Returns:
+        Book: The added or updated Book object.
+    """
+    logging.warning("Starting add_or_update_book")
+    isbn = data.get('isbn')
+    if isbn and (not isbn.isdigit() or len(isbn) != 13):
+        logging.error("ISBN must be a 13-digit number")
+        return None
+    if not isbn:
+        logging.error("ISBN is required to add a book")
+        return None
+    if not data.get('title'):
+        logging.error("Title is required to add a book")
+        return None
+    if not data.get('authors'):
+        logging.error("Author is required to add a book")
+        return None
+
+    try:
+        # Check if the book already exists
+        book = Book.query.get(str(isbn))  # Ensure ISBN is passed as a string
+        if not book:
+            logging.info(f"Adding new book with ISBN: {isbn}")
+            book = Book(isbn=isbn)
+        else:
+            logging.info(f"Updating existing book with ISBN: {isbn}")
+
+        # Update book details
+        book.title = data.get('title')
+        book.author = data.get('authors')
+        book.description = data.get('description', "No description available.")
+        book.published_date = data.get('publishedDate')
+        book.page_count = data.get('pageCount', 0)  # Default to 0 if not provided
+        book.thumbnail = data.get('thumbnail', None)
+        book.categories = data.get('categories', None)
+
+        db.session.add(book)
+        db.session.commit()
+        return book
+    except Exception as e:
+        logging.error(f"Failed to add/update book with ISBN: {isbn}. Error: {str(e)}")
+        raise
+
 
 def get_book_metadata(title, author, google_books_api_key):
     """Fetch metadata for a book using Google Books API."""
-    api_key = google_books_api_key  # Fetch API key from environment variables
-    base_url = "https://www.googleapis.com/books/v1/volumes"
+    # First check if book exists in database by title and author
+    book = Book.query.filter_by(title=title, author=author).first()
+    if book:
+        # Return existing book metadata
+        return {
+            "title": book.title,
+            "authors": book.author,
+            "description": book.description,
+            "categories": book.categories,
+            "publishedDate": book.published_date,
+            "pageCount": book.page_count,
+            "thumbnail": book.thumbnail,
+            "isbn": book.isbn
+        }
 
-    # Construct query for title and author
+    # If not found in DB, fetch from Google Books API
+    api_key = google_books_api_key
+    base_url = "https://www.googleapis.com/books/v1/volumes"
     query = f"intitle:{title}+inauthor:{author}"
 
     params = {
@@ -84,6 +115,7 @@ def get_book_metadata(title, author, google_books_api_key):
         response = requests.get(base_url, params=params)
         logging.warning(response.status_code)
         if response.status_code == 200:
+            logging.warning("Response is 200")
             data = response.json()
             if 'items' in data:
                 book = data['items'][0]['volumeInfo']
@@ -94,8 +126,10 @@ def get_book_metadata(title, author, google_books_api_key):
                     "categories": book.get("categories"),
                     "publishedDate": book.get("publishedDate"),
                     "pageCount": book.get("pageCount"),
-                    "thumbnail": book.get("imageLinks", {}).get("thumbnail")
+                    "thumbnail": book.get("imageLinks", {}).get("thumbnail"),
+                    "isbn": str(next((identifier.get("identifier") for identifier in book.get("industryIdentifiers", []) if identifier.get("type") == "ISBN_13"), ""))
                 }
+                add_or_update_book(metadata)
                 return metadata
         return {"error": "No book data found"}
     except Exception as e:
@@ -112,6 +146,8 @@ def get_amazon_search_link(title, author):
 # Example usage (in your main app code):
 openai_api_key_raw = get_secrets("openai_api_key")
 google_books_api_key_raw = get_secrets("google_books_api")
+postgres_url = get_secrets("postgres_url")['postgres_url']
+flask_secret_key = get_secrets("flask_secret_key")['flask_secret_key']
 
 # Extract the OpenAI API key from the secret
 openai_api_key = openai_api_key_raw['api_key']
@@ -124,30 +160,26 @@ client = OpenAI(
 
 # Initialize Flask app
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = postgres_url
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = flask_secret_key
+
+db.init_app(app)
 
 sitemap = Sitemap(app=app)
+app.config['SITEMAP_URL_SCHEME'] = "https"
+
+from flask_login import LoginManager
+
+login_manager = LoginManager()
+login_manager.login_view = 'login'  # Redirect unauthorized users to the login page
+
+@login_manager.user_loader
+def load_user(user_id):
+    return db.session.get(User, int(user_id))  # No explicit transaction management
 
 
-def create_prompt(obscurity_level, user_input, mbti):
-    prompt = f"""
-    "MBTI": {mbti},
-    "Obscurity_level": {obscurity_level},
-    "Preferences: {user_input} 
-    """
-
-    return prompt
-
-
-def set_obscurity(obscurity_level):
-    # Adjust the prompt based on obscurity_level
-    if obscurity_level <= 3:
-        prompt_obscurity_modifier = "The user wants highly popular books "
-    elif obscurity_level >= 8:
-        prompt_obscurity_modifier = "The user wants rare or obscure books "
-    else:
-        prompt_obscurity_modifier = ""
-
-    return prompt_obscurity_modifier
+login_manager.init_app(app)
 
 
 def identify_books(text):
@@ -209,7 +241,8 @@ def index():
 
                     book_details = get_book_metadata(title, author, google_books_api_key)
                     book_details["amazon_link"] = get_amazon_search_link(title, author)
-                    if book_details:
+                    if book_details.get("isbn"):
+                        logging.warning(f"Adding book to all_book_metadata: {book_details}")
                         all_book_metadata.append(book_details)
                     logging.warning(book_details)
 
@@ -294,7 +327,7 @@ def generate_reader_profile():
         book_details = get_book_metadata(title, author, google_books_api_key)
         book_details["amazon_link"] = get_amazon_search_link(title, author)
         book_details["ga_event"] = f"Outbound Link: {title}"
-        if book_details.get("title"):
+        if book_details.get("isbn"):
             all_book_metadata.append(book_details)
         logging.warning(book_details)
 
@@ -343,6 +376,96 @@ def blog_post(post_title):
 @app.route("/community")
 def community():
     return render_template("community.html")
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+        
+        if User.query.filter_by(email=email).first():
+            return "Email already registered!"
+        
+        user = User(username=username, email=email)
+        user.set_password(password)
+        db.session.add(user)
+        db.session.commit()
+        return redirect(url_for('login'))
+
+    return render_template('register.html')
+
+from flask_login import login_user
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        user = User.query.filter_by(email=email).first()
+        
+        if user and user.check_password(password):
+            login_user(user, remember=True)
+            flash('Logged in successfully.')
+            return redirect(url_for('index'))
+        else:
+            return "Invalid credentials!"
+    
+    return render_template('login.html')
+
+from flask_login import logout_user
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
+@app.route('/my_account')
+def my_account():
+    return render_template('my_account.html', user=current_user)
+
+@app.route('/book/<string:isbn>')
+def book_page(isbn):
+    # Fetch the book from the database by ISBN
+    book = Book.query.get_or_404(isbn)
+    return render_template('book.html', book=book)
+
+
+@app.route('/read_books', methods=['GET'])
+@login_required
+def read_books():
+    # Fetch all UserBook entries for the current user
+    user_books = UserBook.query.filter_by(user_id=current_user.id).all()
+    return render_template('read_books.html', user_books=user_books)
+
+
+@app.route('/under_construction')
+def under_construction():
+    return render_template('under_construction.html')
+
+
+@app.route('/update_book_status/<string:isbn>', methods=['POST'])
+@login_required
+def update_book_status(isbn):
+    # Get the book
+    book = Book.query.get_or_404(isbn)
+
+    # Get the selected status from the form
+    status = request.form.get('status')
+
+    # Find or create the UserBook entry
+    user_book = UserBook.query.filter_by(user_id=current_user.id, book_isbn=isbn).first()
+    if not user_book:
+        user_book = UserBook(user_id=current_user.id, book_isbn=isbn)
+        db.session.add(user_book)
+
+    # Update the status
+    user_book.status = status
+    db.session.commit()
+
+    flash(f'Status for "{book.title}" updated to "{status.replace("_", " ").title()}"!', 'success')
+    return redirect(url_for('index'))  # Redirect back to the book list
+
 
 
 if __name__ == "__main__":

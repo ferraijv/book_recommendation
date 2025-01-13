@@ -1,30 +1,51 @@
 {% extends "base.html" %}
 
-{% block title %}Book{% endblock %}
+{% block title %}Book - {{ book.title }}{% endblock %}
 
 {% block content %}
-    <div class="container">
+    <div class="container-book-page">
         <div class="book-header">
-            <div class="book-image">
-                <img src="{{book.image}}" alt="{{book.title}}">
+            <h1 class="book-title">{{ book.title }}</h1>
+            <p class="book-author"><strong>Author:</strong> {{ book.author }}</p>
+        </div>
+
+        <div class="book-page-details">
+            <div class="book-page-thumbnail">
+                <img src="{{ book.thumbnail }}" alt="Book Cover">
             </div>
-            <div class="book-details">
-                <div class="book-title">{{book.title}}</div>
-                <div class="book-author">Author: {{book.author}}</div>
-                <div class="book-meta">
-                    <p><strong>ISBN:</strong> {{ISBN}}</p>
-                    <p><strong>Number of Pages:</strong> {{book.page_count}}</p>
-                    <p><strong>Categories:</strong> {{book.categories}}</p>
-                </div>
+            <div class="book-page-info">
+                <p><strong>Published Date:</strong> {{ book.published_date or 'Unknown' }}</p>
+                <p><strong>Page Count:</strong> {{ book.page_count or 'N/A' }}</p>
+                <p><strong>Categories:</strong> {{ book.categories or 'Not categorized' }}</p>
+                <p class="book-page-description">
+                    {{ book.description[:200] }}
+                    {% if book.description|length > 200 %}
+                    <span class="ellipsis">...</span>
+                    <span class="more-text" style="display: none;">{{ book.description[200:] }}</span>
+                    <a href="javascript:void(0);" class="see-more" onclick="toggleDescription(this)">See More</a>
+                    {% endif %}
+                </p>
             </div>
         </div>
-        <div class="book-description">
-            <h3>Description:</h3>
-            <p>{{book.description}}</p>
+
+        <div class="book-actions">
+            <form method="POST" action="{{ url_for('update_book_status', isbn=book.isbn) }}">
+                <label for="rating"><strong>Rate this book:</strong></label>
+                <select id="rating" name="rating">
+                    <option value="" selected>Choose a rating</option>
+                    <option value="Hated it">Hated it</option>
+                    <option value="Did not like it">Did not like it</option>
+                    <option value="It was ok">It was ok</option>
+                    <option value="Liked it">Liked it</option>
+                    <option value="Loved it">Loved it</option>
+                    <option value="Amazing">Amazing</option>
+                </select>
+                <button type="submit">Mark as Read</button>
+            </form>
         </div>
-        <div class="ratings">
-            <p><strong>Ratings:</strong> <span>{{book.ratings_count}}</span> ratings</p>
-            <p><strong>Average Rating:</strong> <span>{{book.average_rating}}</span></p>
+
+        <div class="back-to-home">
+            <a href="{{ url_for('index') }}">← Back to Home</a>
         </div>
     </div>
 {% endblock %}

@@ -34,33 +34,9 @@
         {{recommendations | safe}}
     </div>
 
+    {% include 'display_books.html' %}
 
-    {% if all_book_metadata %}
-        <h2>Recommended Books:</h2>
-        <div>
-            {% for book in all_book_metadata %}
-            <div class="book-container">
-                <div class="book">
-                    <h3>{{ book.title }}</h3>
-                    {% if book.thumbnail and book.amazon_link %}
-                        <a href="{{ book.amazon_link }}" target="_blank" data-ga-event="{{ book.ga_event }}">
-                            <img src="{{ book.thumbnail }}" alt="Book cover">
-                        </a>
-                    {% elif book.thumbnail %}
-                        <img src="{{ book.thumbnail }}" alt="Book cover">
-                    {% endif %}
-                    <p><strong>Authors:</strong> {{ book.authors | join(", ") if book.authors else "N/A" }}</p>
-                    <p><strong>Description:</strong> {{ book.description or "No description available" }}</p>
-                    <p><strong>Categories:</strong> {{ book.categories | join(", ") if book.categories else "N/A" }}</p>
-                    <p><strong>Published Date:</strong> {{ book.publishedDate or "N/A" }}</p>
-                    <p><strong>Page Count:</strong> {{ book.pageCount or "N/A" }}</p>
-                    <a href="{{ book.amazon_link }}" class="buy-button">View on Amazon</a>
-                </div>
-                </div>
-                <hr>
-            {% endfor %}
-        </div>
-    {% endif %}
+
     <script>
     const form = document.querySelector("form");
     const spinner = document.getElementById("loadingSpinner");
