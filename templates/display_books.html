@@ -18,11 +18,15 @@
             {% endif %}
             <p><strong>Authors:</strong> {{ book.authors | join(", ") if book.authors else "N/A" }}</p>
             <p class="book-description">
-                {{ book.description[:200] }}
-                {% if book.description|length > 200 %}
-                <span class="ellipsis">...</span>
-                <span class="more-text" style="display: none;">{{ book.description }}</span>
-                <a href="javascript:void(0);" class="see-more" onclick="toggleDescription(this)">See More</a>
+                {% if book.description %}
+                    {{ book.description[:200] }}
+                    {% if book.description|length > 200 %}
+                        <span class="ellipsis">...</span>
+                        <span class="more-text" style="display: none;">{{ book.description }}</span>
+                        <a href="javascript:void(0);" class="see-more" onclick="toggleDescription(this)">See More</a>
+                    {% endif %}
+                {% else %}
+                    <p>No description available.</p>
                 {% endif %}
             </p>
 

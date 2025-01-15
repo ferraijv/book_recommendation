@@ -17,6 +17,7 @@ from contextlib import contextmanager
 from utils.blog_utils import load_blog_posts
 from utils.prompt_utils import set_obscurity, create_prompt
 from utils.config_utils import get_secrets
+from sqlalchemy.sql.expression import func
 
 
 from flask import Flask, render_template, request, abort
@@ -249,7 +250,15 @@ def index():
             except Exception as e:
                 recommendations = f"Error: {e}"
 
-    return render_template("index.html", all_book_metadata=all_book_metadata, recommendations=recommendations)
+    popular_books = (
+    db.session.query(Book, func.count(UserBook.book_isbn).label('book_count'))
+    .join(UserBook, Book.isbn == UserBook.book_isbn)
+    .group_by(Book)
+    .order_by(func.count(UserBook.book_isbn).desc())
+    .limit(5)
+    .all())
+
+    return render_template("index.html", all_book_metadata=all_book_metadata, recommendations=recommendations, popular_books=popular_books)
 
 
 @app.route("/about")
@@ -428,10 +437,21 @@ def my_account():
 
 @app.route('/book/<string:isbn>')
 def book_page(isbn):
-    # Fetch the book from the database by ISBN
+    # Get main book
     book = Book.query.get_or_404(isbn)
-    return render_template('book.html', book=book)
-
+    
+    # Get similar books based on categories
+    similar_books = []
+    if book.categories:
+        # Use the first category from the array
+        main_category = book.categories[0]
+        similar_books = Book.query.filter(
+            Book.categories.op('&&')([main_category]),  # Check if the array overlaps with the main category
+            Book.isbn != isbn  # Exclude current book
+        ).order_by(func.random()).limit(5).all()
+    
+    
+    return render_template('book.html', book=book, similar_books=similar_books)
 
 @app.route('/read_books', methods=['GET'])
 @login_required

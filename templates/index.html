@@ -58,6 +58,30 @@
     {% include 'display_books.html' %}
 </div>
 
+<div class="popular-books">
+    <h2>SmartBookFinder's Most Popular Books</h2>
+    <div class="popular-books-grid">
+        {% for book, count in popular_books %}
+        <div class="popular-book-card">
+            <a href="{{ url_for('book_page', isbn=book.isbn) }}" class="popular-book-link">
+                <div class="popular-book-image">
+                    {% if book.thumbnail %}
+                    <img src="{{ book.thumbnail }}" alt="{{ book.title }}">
+                    {% else %}
+                    <div class="no-cover">No Cover Available</div>
+                    {% endif %}
+                </div>
+                <div class="popular-book-info">
+                    <h3>{{ book.title }}</h3>
+                    <p>By {{ book.author.replace("{", "").replace("}", "").replace("\"", "") }}</p>
+                    <p><strong>{{ count }} Users</strong> have read this book</p>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
 <script>
     const obscuritySlider = document.getElementById('obscurity');
     const obscurityValue = document.getElementById('obscurity-value');
