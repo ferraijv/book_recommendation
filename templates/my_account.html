@@ -1,49 +1,33 @@
 {% extends "base.html" %}
 
-{% block title %}Account Details{% endblock %}
+{% block title %}{{ user.username }}'s Account{% endblock %}
 
 {% block content %}
-    <div class="container">
-        <h1>My Account</h1>
-        <div class="user-details">
-            <p><strong>Username:</strong> {{ user.username }}</p>
-            <p><strong>Email:</strong> {{ user.email }}</p>
+<div class="account-container">
+    <div class="profile-header">
+        <div class="profile-avatar">
+            {{ user.username[0]|upper }}
+        </div>
+        <div class="profile-info">
+            <h1>My Account</h1>
+            <div class="username">{{ user.username }}'s Library</div>
+            <div class="email">{{ user.email }}</div>
         </div>
     </div>
-    {% if user_books %}
-    <ul class="book-list">
-        {% for user_book in user_books %}
-        <li class="book-item">
-            <div class="book-thumbnail">
-                {% if user_book.book.thumbnail %}
-                <img src="{{ user_book.book.thumbnail }}" alt="Book Cover">
-                {% else %}
-                <div class="no-thumbnail">No Image</div>
-                {% endif %}
-            </div>
-            <div class="book-details">
-                <h2 class="book-title">
-                    <a href="{{ url_for('book_page', isbn=user_book.book.isbn) }}">{{ user_book.book.title }}</a>
-                </h2>
-                <p><strong>Author:</strong> {{ user_book.book.author }}</p>
-                <p><strong>Rating:</strong> {{ user_book.rating or "Not Rated" }}</p>
-                <p class="book-description">
-                    {{ user_book.book.description[:200] }}
-                    {% if user_book.book.description|length > 200 %}
-                    <span class="ellipsis">...</span>
-                    <span class="more-text" style="display: none;">{{ user_book.book.description[200:] }}</span>
-                    <a href="javascript:void(0);" class="see-more" onclick="toggleDescription(this)">See More</a>
-                    {% endif %}
-                </p>
-                <p><strong>Categories:</strong> {{ user_book.book.categories or "Not categorized" }}</p>
-            </div>
-        </li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p class="no-books">You haven't marked any books as read yet. Start exploring and reading!</p>
-{% endif %}
 
-
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">{{ books_read }}</div>
+            <div class="stat-label">Books Read</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ average_rating }}</div>
+            <div class="stat-label">Average Rating</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ reading_streak }}</div>
+            <div class="stat-label">Day Reading Streak</div>
+        </div>
+    </div>
+</div>
 {% endblock %}
-

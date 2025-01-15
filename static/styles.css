@@ -11,7 +11,7 @@ h1 {
 
 img {
     background: none;
-    max-width: 10%;
+    max-width: 40%;
 }
 
 textarea {
@@ -305,6 +305,39 @@ h2 {
         font-size: 1rem;
         padding: 8px 16px;
     }
+    .container {
+        max-width: 750px;
+        margin: 0 auto;
+    }
+    
+    .book-item {
+        flex-direction: row;
+    }
+    
+    .book-thumbnail {
+        width: 150px;
+        flex-shrink: 0;
+    }
+    
+    .book-details {
+        padding-left: 15px;
+    }
+
+    .user-status {
+        text-align: center;
+        display: block;
+        padding: 5px 20px;
+    }
+    .reader-profile-form {
+        padding: 15px;
+    }
+
+    .form-title {
+        font-size: 1.5rem;
+    }
+    .navbar-search input {
+        width: 200px;
+    }
 }
 .hero-content h1 {
     animation: fadeIn 2s ease-in-out;
@@ -585,13 +618,6 @@ textarea, input[type="text"] {
     display: inline-block;
 }
 
-@media (max-width: 768px) {
-    .user-status {
-        text-align: center;
-        display: block;
-        padding: 5px 20px;
-    }
-}
 
 .container-book-page {
     max-width: 800px;
@@ -713,7 +739,7 @@ textarea, input[type="text"] {
 
 .book-item {
     display: flex;
-    align-items: flex-start;
+    flex-wrap: wrap; /* Allow items to wrap on smaller screens */
     gap: 20px;
     margin-bottom: 20px;
     padding: 15px;
@@ -721,6 +747,7 @@ textarea, input[type="text"] {
     border-radius: 8px;
     background-color: #fff;
     transition: transform 0.2s, box-shadow 0.2s;
+    overflow: hidden;
 }
 
 .book-item:hover {
@@ -909,6 +936,10 @@ textarea:focus {
     .search-container {
         padding: 1.5rem;
     }
+    .book-item {
+        flex-direction: column; /* Stack items vertically on smaller screens */
+        align-items: center;
+    }
 }
 /* General Form Styling */
 .reader-profile-form {
@@ -996,16 +1027,6 @@ textarea:focus {
     font-size: 2rem;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .reader-profile-form {
-        padding: 15px;
-    }
-
-    .form-title {
-        font-size: 1.5rem;
-    }
-}
 
 .navbar-search input {
     width: 300px;
@@ -1028,8 +1049,99 @@ textarea:focus {
 .navbar-search button:hover {
     background-color: #003d80;
 }
+/* Profile Container */
+.account-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 2rem;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Profile Header */
+.profile-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    background-color: #f0f0f0;
+    border-radius: 60%;
+    margin: 0 auto 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+}
+
+.profile-info {
+    margin-bottom: 2rem;
+}
+
+.profile-info h1 {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.profile-info .username {
+    font-size: 1.5rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+}
+
+.profile-info .email {
+    color: #777;
+    font-size: 1rem;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.stat-card {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #007bff;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Mobile Responsiveness */
 @media (max-width: 768px) {
-    .navbar-search input {
-        width: 200px;
+    .account-container {
+        margin: 10px;
+        padding: 1rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+    }
+
+    .stat-card {
+        padding: 1rem;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
     }
 }
