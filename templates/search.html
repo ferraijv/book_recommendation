@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+
+{% block title %}SmartBookFinder - Search Books{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>Find Your Book</h1>
+    <p class="subtitle">Search by title, author, or both</p>
+</div>
+
+<div class="main-container">
+    <div class="search-container">
+        <form method="post" class="search-form">
+            <div class="search-fields">
+                <div class="form-group">
+                    <label for="title">Book Title</label>
+                    <input 
+                        type="text" 
+                        id="title" 
+                        name="title" 
+                        placeholder="Enter book title..."
+                        class="search-input"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="author">Author</label>
+                    <input 
+                        type="text" 
+                        id="author" 
+                        name="author" 
+                        placeholder="Enter author name..."
+                        class="search-input"
+                    >
+                </div>
+            </div>
+
+            <button type="submit" class="search-button">
+                <span class="button-text">Search</span>
+                <div class="spinner" id="loadingSpinner"></div>
+            </button>
+        </form>
+    </div>
+
+    <div class="results" id="results">
+        {% if books %}
+            <h2>Search Results</h2>
+            <div class="books-grid">
+                {% for book in books %}
+                    <div class="book-card">
+                        <img src="{{ book.cover_url }}" alt="Cover of {{ book.title }}" class="book-cover">
+                        <div class="book-info">
+                            <h3 class="book-title">{{ book.title }}</h3>
+                            <p class="book-author">by {{ book.author }}</p>
+                            <p class="book-details">{{ book.year }} • {{ book.pages }} pages</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% elif searched %}
+            <div class="no-results">
+                <p>No books found matching your search criteria.</p>
+                <p>Try adjusting your search terms or check the spelling.</p>
+            </div>
+        {% endif %}
+    </div>
+        {% include 'display_books.html' %}
+</div>
+
+<style>
+    .main-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    .search-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .search-fields {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    label {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e1e1e1;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #4A90E2;
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+    }
+
+    .search-button {
+        width: 100%;
+        padding: 1rem;
+        background: #4A90E2;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .search-button:hover {
+        background: #357ABD;
+    }
+
+    .spinner {
+        display: none;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255,255,255,0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .books-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    .book-card {
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s;
+    }
+
+    .book-card:hover {
+        transform: translateY(-4px);
+    }
+
+    .book-cover {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+    }
+
+    .book-info {
+        padding: 1rem;
+    }
+
+    .book-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #333;
+    }
+
+    .book-author {
+        color: #666;
+        margin-bottom: 0.5rem;
+    }
+
+    .book-details {
+        font-size: 0.9rem;
+        color: #888;
+    }
+
+    .no-results {
+        text-align: center;
+        padding: 3rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        color: #666;
+    }
+
+    @media (max-width: 640px) {
+        .hero h1 {
+            font-size: 2rem;
+        }
+
+        .search-fields {
+            grid-template-columns: 1fr;
+        }
+
+        .search-container {
+            padding: 1.5rem;
+        }
+    }
+</style>
+
+<script>
+const form = document.querySelector('form');
+const spinner = document.getElementById('loadingSpinner');
+const buttonText = document.querySelector('.button-text');
+
+form.addEventListener('submit', () => {
+    spinner.style.display = 'block';
+    buttonText.textContent = 'Searching...';
+});
+</script>
+{% endblock %}

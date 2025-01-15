@@ -3,41 +3,72 @@
 {% block title %}SmartBookFinder - Reader Profile Input{% endblock %}
 
 {% block content %}
-<h1>Create Your Reader Profile</h1>
+<h1 class="form-title">Create Your Reader Profile</h1>
 <div class="spinner" id="loadingSpinner"></div>
+<div class="reader-profile-form">
     <form method="POST" action="/generate-reader-profile">
-        <label for="genres">What are your favorite genres? (e.g., mystery, sci-fi, romance)</label><br>
-        <textarea id="genres" name="genres" rows="3" placeholder="Type your favorite genres..."></textarea><br><br>
 
-        <label for="themes-to-avoid">Are there any themes or genres you want to avoid? (e.g., horror, dystopian, romance)</label><br>
-        <textarea id="themes-to-avoid" name="themes_to_avoid" rows="3" placeholder="Type the genres or themes you dislike..."></textarea><br><br>
+        <!-- Section 1: Favorites -->
+        <fieldset>
+            <legend>Favorites</legend>
+            <label for="favorite-books">Favorite Books</label>
+            <textarea id="favorite-books" name="favorite_books" rows="3" placeholder="E.g., Pride and Prejudice, Dune"></textarea>
 
-        <label for="favorite-books">What are your favorite books? (e.g., Pride and Prejudice, Dune, etc.)</label><br>
-        <textarea id="favorite-books" name="favorite_books" rows="3" placeholder="Type the titles of your favorite books..."></textarea><br><br>
+            <label for="favorite-authors">Favorite Authors</label>
+            <textarea id="favorite-authors" name="favorite_authors" rows="3" placeholder="E.g., Jane Austen, Frank Herbert"></textarea>
 
-        <label for="reading-frequency">How often do you read? (Daily, Weekly, Occasionally)</label><br>
-        <select id="reading-frequency" name="reading_frequency">
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-            <option value="occasionally">Occasionally</option>
-        </select><br><br>
+            <label for="genres">Favorite Genres</label>
+            <textarea id="genres" name="genres" rows="3" placeholder="E.g., mystery, sci-fi, romance"></textarea>
+        </fieldset>
 
-        <label for="preferred-format">What is your preferred format?</label><br>
-        <input type="radio" id="ebook" name="format" value="ebook">
-        <label for="ebook">Ebook</label><br>
-        <input type="radio" id="audiobook" name="format" value="audiobook">
-        <label for="audiobook">Audiobook</label><br>
-        <input type="radio" id="physical" name="format" value="physical">
-        <label for="physical">Physical Book</label><br><br>
+        <!-- Section 2: Preferences -->
+        <fieldset>
+            <legend>Preferences</legend>
+            <label for="themes-to-avoid">Genres to Avoid</label>
+            <textarea id="themes-to-avoid" name="themes_to_avoid" rows="3" placeholder="E.g., horror, dystopian"></textarea>
+        </fieldset>
 
-        <label for="reading-goals">What are your reading goals? (e.g., read more, explore new genres)</label><br>
-        <textarea id="reading-goals" name="reading_goals" rows="3" placeholder="Type your reading goals..."></textarea><br><br>
+        <!-- Section 3: Reading Habits -->
+        <fieldset>
+            <legend>Reading Habits</legend>
+            <label for="reading-frequency">How often do you read?</label>
+            <select id="reading-frequency" name="reading_frequency">
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="occasionally">Occasionally</option>
+            </select>
 
-        <label for="mbti">Optional: What is your Myers-Briggs Personality Type (e.g., INTJ, ENFP)?</label><br>
-        <input type="text" id="mbti" name="mbti" maxlength="4" placeholder="Type your MBTI (e.g., INTJ)" /><br><br>
+            <label for="preferred-format">Preferred Format</label>
+            <div class="radio-group">
+                <input type="radio" id="ebook" name="format" value="ebook">
+                <label for="ebook">Ebook</label>
+
+                <input type="radio" id="audiobook" name="format" value="audiobook">
+                <label for="audiobook">Audiobook</label>
+
+                <input type="radio" id="physical" name="format" value="physical">
+                <label for="physical">Physical Book</label>
+            </div>
+        </fieldset>
+
+        <!-- Section 4: Goals -->
+        <fieldset>
+            <legend>Goals</legend>
+            <label for="reading-goals">Reading Goals</label>
+            <textarea id="reading-goals" name="reading_goals" rows="3" placeholder="E.g., explore new genres, read more"></textarea>
+        </fieldset>
+
+        <!-- Section 5: Optional -->
+        <fieldset>
+            <legend>Optional</legend>
+            <label for="mbti">MBTI Personality Type</label>
+            <input type="text" id="mbti" name="mbti" maxlength="4" placeholder="E.g., INTJ, ENFP">
+        </fieldset>
 
         <button type="submit">Generate My Profile</button>
     </form>
+</div>
+
     <script>
     const form = document.querySelector("form");
     const spinner = document.getElementById("loadingSpinner");

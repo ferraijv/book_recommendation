@@ -4,46 +4,95 @@
 
 {% block content %}
 <h1>Welcome to SmartBookFinder</h1>
-    <div class="spinner" id="loadingSpinner"></div>
-    <div class="container">
-    <form method="post">
-        <label for="preferences">What are you looking for?:</label><br>
-        <textarea id="preferences" name="preferences" rows="4" cols="50" placeholder="e.g., genre, themes, topic, or favorite books"></textarea><br>
+<div class="main-container">
+    <div class="search-container">
+        <form method="post" class="search-form">
+            <div class="form-group">
+                <label for="preferences">What are you looking for?</label>
+                <textarea 
+                    id="preferences" 
+                    name="preferences" 
+                    rows="4"
+                    placeholder="e.g., genre, themes, topic, or favorite books"
+                ></textarea>
+            </div>
 
-        <div class="tooltip-container">
-            <label for="obscurity">Obscurity Level:</label>
-            <input type="range" id="obscurity" name="obscurity" min="1" max="10" value="5">
-            <span id="obscurity-value"></span>
-            <div class="tooltip">Adjust the slider to set how obscure you want your book recommendations to be. Lower values favor popular books, while higher values favor rare finds.</div>
-        </div>
-        <br>
-        <br>
-        <button type="submit">Get Recommendations</button>
-    </form>
+            <div class="obscurity-container">
+                <div class="obscurity-header">
+                    <label for="obscurity">Obscurity Level</label>
+                    <span class="obscurity-value" id="obscurity-value">5</span>
+                </div>
+                
+                <input 
+                    type="range" 
+                    id="obscurity" 
+                    name="obscurity" 
+                    min="1" 
+                    max="10" 
+                    value="5"
+                    class="slider"
+                >
+                
+                <div class="slider-labels">
+                    <span>Popular</span>
+                    <span>Hidden Gems</span>
+                </div>
+                
+                <div class="tooltip">
+                    Adjust the slider to set how obscure you want your book recommendations to be. 
+                    Lower values favor popular books, while higher values favor rare finds.
+                </div>
+            </div>
+
+            <button type="submit" class="submit-button">
+                <span class="button-text">Find Books</span>
+                <div class="spinner" id="loadingSpinner"></div>
+            </button>
+        </form>
     </div>
 
-    <script>
-    const obscuritySlider = document.getElementById('obscurity');
-    const obscurityValue = document.getElementById('obscurity-value');
-    obscuritySlider.addEventListener('input', () => {
-        obscurityValue.textContent = obscuritySlider.value;
-    });
-    </script>
-
-    <div class="Results">
+    <div class="results" id="results">
         {{recommendations | safe}}
     </div>
 
     {% include 'display_books.html' %}
+</div>
 
-
-    <script>
-    const form = document.querySelector("form");
-    const spinner = document.getElementById("loadingSpinner");
-    form.addEventListener("submit", () => {
-        spinner.style.display = "block"; // Show the spinner
-        loadingText.style.display = "block"; // Show the loading text
+<script>
+    const obscuritySlider = document.getElementById('obscurity');
+    const obscurityValue = document.getElementById('obscurity-value');
+    const form = document.querySelector('form');
+    const spinner = document.getElementById('loadingSpinner');
+    const buttonText = document.querySelector('.button-text');
+    
+    // Update obscurity value display
+    obscuritySlider.addEventListener('input', () => {
+        obscurityValue.textContent = obscuritySlider.value;
     });
+    
+    // Random placeholder text functionality
+    const placeholderTexts = [
+        "e.g., science fiction novels about time travel",
+        "e.g., books similar to Pride and Prejudice",
+        "e.g., mysteries set in Victorian London",
+        "e.g., self-help books about productivity",
+        "e.g., books that make you feel like you're in a different world"
+    ];
+    
+    function setRandomPlaceholder() {
+        const textarea = document.getElementById('preferences');
+        const randomIndex = Math.floor(Math.random() * placeholderTexts.length);
+        textarea.placeholder = placeholderTexts[randomIndex];
+    }
+    
+    // Handle form submission
+    form.addEventListener('submit', () => {
+        spinner.style.display = 'block';
+        buttonText.textContent = 'Finding Books...';
+    });
+    
+    // Set initial random placeholder
+    setRandomPlaceholder();
     </script>
     <br><br>
 {% endblock %}

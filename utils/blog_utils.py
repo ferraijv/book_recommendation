@@ -2,6 +2,7 @@ import os
 import yaml
 import logging
 from markdown2 import markdown, Markdown
+
 BLOG_DIR = "blog/posts"
 
 def load_blog_posts():
@@ -16,5 +17,4 @@ def load_blog_posts():
                     html_content = markdown(parts[2].strip())
                     posts.append({"metadata": metadata, "content": html_content})
 
-    logging.warning(posts)
     return sorted(posts, key=lambda x: x["metadata"]["date"], reverse=True)

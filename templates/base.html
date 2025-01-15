@@ -16,6 +16,8 @@
     <link rel="stylesheet" href="/static/styles.css">
     <link rel="canonical" href="https://smartbookfinder.com{{ request.path }}" />
     <link rel="icon" type="image/webp" href="{{ url_for('static', filename='images/flavicon.webp') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
 </head>
 <body>
     <!-- Shared Navigation -->
@@ -30,15 +32,13 @@
             <a href="/about">About</a>
             <a href="/blog">Blog</a>
             <a href="/community">Community</a>
-            <!--
+            <a href="/search">Search</a>
             {% if current_user.is_authenticated %}
-                <a href="{{ url_for('about')}}">Logged in: {{ current_user.username }}!</a>
+                <a href="/my_account"> Logged in as: {{ current_user.username }}</a>
                 <a href="{{ url_for('logout') }}">Logout</a>
             {% else %}
-                <a href="{{ url_for('login') }}">Login</a>
-                <a href="{{ url_for('register') }}">Register</a>
+                <a href="/login">Login/Register</a>
             {% endif %}
-            -->
         </div>
     </div>
     {% with messages = get_flashed_messages(with_categories=true) %}

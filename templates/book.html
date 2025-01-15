@@ -3,49 +3,54 @@
 {% block title %}Book - {{ book.title }}{% endblock %}
 
 {% block content %}
-    <div class="container-book-page">
-        <div class="book-header">
-            <h1 class="book-title">{{ book.title }}</h1>
-            <p class="book-author"><strong>Author:</strong> {{ book.author }}</p>
-        </div>
+<div class="book-container">
+    <!-- Book Header -->
+    <div class="book-header">
+        <h1 class="book-title">{{ book.title }}</h1>
+        <p class="book-author"><strong>Author:</strong> {{ book.author.replace("{", "").replace("}", "").replace("\"", "") }}</p>
+    </div>
 
-        <div class="book-page-details">
-            <div class="book-page-thumbnail">
-                <img src="{{ book.thumbnail }}" alt="Book Cover">
-            </div>
-            <div class="book-page-info">
-                <p><strong>Published Date:</strong> {{ book.published_date or 'Unknown' }}</p>
-                <p><strong>Page Count:</strong> {{ book.page_count or 'N/A' }}</p>
-                <p><strong>Categories:</strong> {{ book.categories or 'Not categorized' }}</p>
-                <p class="book-page-description">
-                    {{ book.description[:200] }}
-                    {% if book.description|length > 200 %}
-                    <span class="ellipsis">...</span>
-                    <span class="more-text" style="display: none;">{{ book.description[200:] }}</span>
-                    <a href="javascript:void(0);" class="see-more" onclick="toggleDescription(this)">See More</a>
-                    {% endif %}
-                </p>
-            </div>
+    <!-- Two-Column Layout -->
+    <div class="book-details">
+        <div class="book-image">
+            <img src="{{ book.thumbnail }}" alt="Book Cover">
         </div>
-
-        <div class="book-actions">
-            <form method="POST" action="{{ url_for('update_book_status', isbn=book.isbn) }}">
-                <label for="rating"><strong>Rate this book:</strong></label>
-                <select id="rating" name="rating">
-                    <option value="" selected>Choose a rating</option>
-                    <option value="Hated it">Hated it</option>
-                    <option value="Did not like it">Did not like it</option>
-                    <option value="It was ok">It was ok</option>
-                    <option value="Liked it">Liked it</option>
-                    <option value="Loved it">Loved it</option>
-                    <option value="Amazing">Amazing</option>
-                </select>
-                <button type="submit">Mark as Read</button>
-            </form>
-        </div>
-
-        <div class="back-to-home">
-            <a href="{{ url_for('index') }}">← Back to Home</a>
+        <div class="book-info">
+            <p><strong>Published Date:</strong> {{ book.published_date or 'Unknown' }}</p>
+            <p><strong>Page Count:</strong> {{ book.page_count or 'N/A' }}</p>
+            <p><strong>Categories:</strong> {{ book.categories or 'Not categorized' }}</p>
+            <p class="book-description">
+                {{ book.description[:200] }}
+                {% if book.description|length > 200 %}
+                <span class="ellipsis">...</span>
+                <span class="more-text" style="display: none;">{{ book.description[200:] }}</span>
+                <a href="javascript:void(0);" class="see-more" onclick="toggleDescription(this)">See More</a>
+                {% endif %}
+            </p>
         </div>
     </div>
+
+    <!-- Book Actions -->
+    <div class="book-actions">
+        <form method="POST" action="{{ url_for('update_book_status', isbn=book.isbn) }}">
+            <label for="rating"><strong>Rate this book:</strong></label>
+            <select id="rating" name="rating">
+                <option value="" selected>Choose a rating</option>
+                <option value="Hated it">Hated it</option>
+                <option value="Did not like it">Did not like it</option>
+                <option value="It was ok">It was ok</option>
+                <option value="Liked it">Liked it</option>
+                <option value="Loved it">Loved it</option>
+                <option value="Amazing">Amazing</option>
+            </select>
+            <button type="submit">Mark as Read</button>
+        </form>
+    </div>
+
+
+    <!-- Back to Home -->
+    <div class="back-to-home">
+        <a href="{{ url_for('index') }}">← Back to Home</a>
+    </div>
+</div>
 {% endblock %}

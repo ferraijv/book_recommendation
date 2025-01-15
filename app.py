@@ -421,8 +421,10 @@ def logout():
     return redirect(url_for('login'))
 
 @app.route('/my_account')
+@login_required
 def my_account():
-    return render_template('my_account.html', user=current_user)
+    user_books = UserBook.query.filter_by(user_id=current_user.id).all()
+    return render_template('my_account.html', user=current_user, user_books=user_books)
 
 @app.route('/book/<string:isbn>')
 def book_page(isbn):
@@ -466,6 +468,23 @@ def update_book_status(isbn):
     flash(f'Status for "{book.title}" updated to "{status.replace("_", " ").title()}"!', 'success')
     return redirect(url_for('index'))  # Redirect back to the book list
 
+@app.route('/search', methods=['GET', 'POST'])
+def search():
+
+    title = request.args.get("title", None)
+    author = request.args.get("author", None)
+
+    all_book_metadata = []  # Initialize an empty results list
+
+    logging.warning(f"title: {title}, author: {author}")
+
+    if title and author:  
+
+        all_book_metadata = [get_book_metadata(title=title, author=author, google_books_api_key=google_books_api_key)]
+
+    logging.warning(all_book_metadata)
+
+    return render_template('search.html', title=title, author=author, all_book_metadata=all_book_metadata)
 
 
 if __name__ == "__main__":

@@ -10,6 +10,39 @@
             <p><strong>Email:</strong> {{ user.email }}</p>
         </div>
     </div>
+    {% if user_books %}
+    <ul class="book-list">
+        {% for user_book in user_books %}
+        <li class="book-item">
+            <div class="book-thumbnail">
+                {% if user_book.book.thumbnail %}
+                <img src="{{ user_book.book.thumbnail }}" alt="Book Cover">
+                {% else %}
+                <div class="no-thumbnail">No Image</div>
+                {% endif %}
+            </div>
+            <div class="book-details">
+                <h2 class="book-title">
+                    <a href="{{ url_for('book_page', isbn=user_book.book.isbn) }}">{{ user_book.book.title }}</a>
+                </h2>
+                <p><strong>Author:</strong> {{ user_book.book.author }}</p>
+                <p><strong>Rating:</strong> {{ user_book.rating or "Not Rated" }}</p>
+                <p class="book-description">
+                    {{ user_book.book.description[:200] }}
+                    {% if user_book.book.description|length > 200 %}
+                    <span class="ellipsis">...</span>
+                    <span class="more-text" style="display: none;">{{ user_book.book.description[200:] }}</span>
+                    <a href="javascript:void(0);" class="see-more" onclick="toggleDescription(this)">See More</a>
+                    {% endif %}
+                </p>
+                <p><strong>Categories:</strong> {{ user_book.book.categories or "Not categorized" }}</p>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p class="no-books">You haven't marked any books as read yet. Start exploring and reading!</p>
+{% endif %}
 
 
 {% endblock %}

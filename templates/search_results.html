@@ -1,20 +1,21 @@
-{% if all_book_metadata %}
-<h2>Recommended Books:</h2>
-<div>
-    {% for book in all_book_metadata %}
-    <div class="book-container">
+{% extends "base.html" %}
+
+{% block title %}Search Results{% endblock %}
+
+{% block content %}
+<h1>Search Results for "{{ query }}"</h1>
+
+{% if results %}
+    <ul>
+        {% for book in results %}
         <div class="book">
-            <a href="/book/{{ book.isbn }}"><h3>{{ book.title }}</h3></a>
+            <h3>{{ book.title }}</h3>
             {% if book.thumbnail and book.amazon_link %}
-            <div class="book-thumbnail">
                 <a href="{{ book.amazon_link }}" target="_blank" data-ga-event="{{ book.ga_event }}">
                     <img src="{{ book.thumbnail }}" alt="Book cover">
                 </a>
-            </div>
             {% elif book.thumbnail %}
-                <div class="book-thumbnail">
-                    <a href="/book/{{ book.isbn }}"><img src="{{ book.thumbnail }}" alt="Book cover"></a>
-                </div>
+                <img src="{{ book.thumbnail }}" alt="Book cover">
             {% endif %}
             <p><strong>Authors:</strong> {{ book.authors | join(", ") if book.authors else "N/A" }}</p>
             <p class="book-description">
@@ -42,8 +43,9 @@
             <p><strong>Page Count:</strong> {{ book.pageCount or "N/A" }}</p>
             <a href="{{ book.amazon_link }}" class="buy-button">View on Amazon</a>
         </div>
-    </div>
-    <hr>
-    {% endfor %}
-</div>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No results found for "{{ query }}". Try searching for a different term!</p>
 {% endif %}
+{% endblock %}
