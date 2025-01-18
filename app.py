@@ -15,7 +15,7 @@ from flask_login import UserMixin, current_user, login_required
 from utils.db_utils import db, User, Book, UserBook
 from contextlib import contextmanager
 from utils.blog_utils import load_blog_posts
-from utils.prompt_utils import set_obscurity, create_prompt
+from utils.prompt_utils import set_obscurity, create_prompt, get_book_recommendations, get_reader_profile_recommendations
 from utils.config_utils import get_secrets
 from sqlalchemy.sql.expression import func
 from werkzeug.utils import secure_filename
@@ -212,6 +212,7 @@ def identify_books(text):
 @app.route("/", methods=["GET", "POST"])
 def index():
     recommendations = ""
+    recommendations_html = ""
     books = None
     book_details = None
     all_book_metadata = []
@@ -224,33 +225,24 @@ def index():
             user_profile = create_prompt(obscurity_level, user_input, mbti)
 
             try:
-                # Call ChatGPT for book recommendations
-                response = client.chat.completions.create(
-                    model="gpt-4o-mini",
-                    messages=[
-                        {"role": "system",
-                         "content": "You are a helpful assistant providing book recommendations. Return list book recommendations based on the user profiles. Return 5 book recommendations"},
-                        {"role": "user", "content": f"User profile: {user_profile}"}
-                    ]
-                )
-                logging.warning(response)
-                recommendations = response.choices[0].message.content.strip()
 
-                books = identify_books(recommendations)
+                recommendations = get_book_recommendations(user_profile, client)
 
-                logging.warning(books)
+                logging.warning(recommendations)
 
-                for book in books:
+                for book in recommendations:
                     logging.warning(book)
                     title = book["title"]
                     author = book["author"]
+                    description = book["description"]
+                    reason = book["reason"]
 
                     book_details = get_book_metadata(title, author, google_books_api_key)
                     book_details["amazon_link"] = get_amazon_search_link(title, author)
+                    book_details["reason"] = reason
                     if book_details.get("isbn"):
                         logging.warning(f"Adding book to all_book_metadata: {book_details}")
                         all_book_metadata.append(book_details)
-                    logging.warning(book_details)
 
             except Exception as e:
                 recommendations = f"Error: {e}"
@@ -263,7 +255,7 @@ def index():
     .limit(5)
     .all())
 
-    return render_template("index.html", all_book_metadata=all_book_metadata, recommendations=recommendations, popular_books=popular_books)
+    return render_template("index.html", all_book_metadata=all_book_metadata, popular_books=popular_books)
 
 
 @app.route("/about")
@@ -287,44 +279,21 @@ def generate_reader_profile():
     themes_to_avoid = request.form.get("themes_to_avoid")[:500]
     mbti = request.form.get("mbti")  # Optional field
 
-    # Prepare the ChatGPT prompt
-    prompt = f"""
-    Analyze the following reading preferences and habits, and create a fun, sharable "Reader Personality" profile:
-    - Favorite Genres: {genres}
-    - Favorite Books: {favorite_books}
-    - Reading Frequency: {reading_frequency}
-    - Preferred Format: {format}
-    - Reading Goals: {reading_goals}
-    - Themes to avoid {themes_to_avoid if themes_to_avoid else "None"}
-    - MBTI: {mbti if mbti else "Not provided"}
-
-    Categorize the user's "Reader Personality" (e.g., "The Book Adventurer", "The Cozy Reader", etc.), describe their traits, and suggest books or themes that align with their profile.
-    """
-    logging.warning(prompt)
     all_book_metadata = []
     try:
-        # Call the ChatGPT API
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": """Analyze the following reading preferences and habits, and create a "Reader Personality" profile. Don't include books they've already read in their suggestions. Return the output in structured Markdown format like this:
-
-                                                **Reader Personality Profile**: <Personality Name>  
-                                                **Traits**: <Description of personality traits>  
-                                                **Suggested Books/Themes**:  
-                                                1. <Book 1>  
-                                                2. <Book 2>  
-                                                3. <Book 3>  
-                                                4. <Book 4>
-                                                5. <Book 5>
-                                                """},
-                {"role": "user", "content": prompt}
-            ]
-        )
-        analysis = response.choices[0].message.content.strip()
-        logging.warning(analysis)
+        reader_profile_details = {
+            "genres": genres,
+            "favorite_books": favorite_books,
+            "reading_frequency": reading_frequency,
+            "format": format,
+            "reading_goals": reading_goals,
+            "themes_to_avoid": themes_to_avoid,
+            "mbti": mbti
+        }
+        analysis = get_reader_profile_recommendations(reader_profile_details, client)
+        logging.info(analysis)
         analysis_html = markdown(analysis)  # Converts Markdown to HTML
-        logging.warning(analysis_html)
+        logging.info(analysis_html)
     except Exception as e:
         analysis = f"Error generating profile: {str(e)}"
         analysis_html = None

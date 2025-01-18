@@ -1279,3 +1279,33 @@ textarea:focus {
     font-size: 0.9rem;
     color: #999;
 }
+.recommendations {
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    margin-bottom: 20px;
+}
+
+.recommendations h3 {
+    margin-top: 15px;
+}
+
+.recommendations ul {
+    padding-left: 20px;
+    list-style-type: disc;
+}
+
+.recommendations-content {
+    white-space: pre-wrap; /* Preserves line breaks from ChatGPT output */
+}
+.book-description, .book-reason {
+    font-size: 0.9rem;
+    color: #555;
+    margin-top: 5px;
+}
+
+.book-reason {
+    font-style: italic;
+    color: #333;
+}
