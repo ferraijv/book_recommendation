@@ -19,10 +19,10 @@
             <p><strong>Authors:</strong> {{ book.authors if book.authors else "N/A" }}</p>
             <p class="book-description">
                 {% if book.description %}
-                <strong>Description:</strong> {{ book.description[:200] }}
+                {{ book.description[:200] }}
                     {% if book.description|length > 200 %}
                         <span class="ellipsis">...</span>
-                        <span class="more-text" style="display: none;"><strong>Description:</strong> {{ book.description }}</span>
+                        <span class="more-text" style="display: none;"> {{ book.description }}</span>
                         <a href="javascript:void(0);" class="see-more" onclick="toggleDescription(this)">See More</a>
                     {% endif %}
                 {% else %}

@@ -10,7 +10,7 @@
         <div class="share-section">
             <h3>Share Your Reader Personality</h3>
             <textarea id="shareableText" readonly rows="6" style="width: 100%; margin-bottom: 10px;">
-        {{ shareable_text.strip() }}
+                {{ shareable_text | safe }}
             </textarea>
             <button id="copyButton">Copy to Clipboard</button>
         </div>

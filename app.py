@@ -244,6 +244,7 @@ def index():
                         logging.warning(f"Adding book to all_book_metadata: {book_details}")
                         all_book_metadata.append(book_details)
 
+
             except Exception as e:
                 recommendations = f"Error: {e}"
 
@@ -318,7 +319,7 @@ def generate_reader_profile():
     return render_template(
         "reader_profile_output.html",
         analysis_html=analysis_html,
-        shareable_text=shareable_text,
+        shareable_text=analysis,
         all_book_metadata=all_book_metadata
     )
 
