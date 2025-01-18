@@ -41,7 +41,7 @@ class UserBook(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     book_isbn = db.Column(db.String(13), db.ForeignKey('book.isbn'), nullable=False)
-    rating = db.Column(db.Integer, nullable=True)
+    rating = db.Column(db.String(13), nullable=True)
     status = db.Column(db.String(20), nullable=False, default="want_to_read")
     timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
     user = db.relationship('User', back_populates='read_books')

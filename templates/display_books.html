@@ -16,7 +16,7 @@
                     <a href="/book/{{ book.isbn }}"><img src="{{ book.thumbnail }}" alt="Book cover"></a>
                 </div>
             {% endif %}
-            <p><strong>Authors:</strong> {{ book.authors | join(", ") if book.authors else "N/A" }}</p>
+            <p><strong>Authors:</strong> {{ book.authors if book.authors else "N/A" }}</p>
             <p class="book-description">
                 {% if book.description %}
                     {{ book.description[:200] }}

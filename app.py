@@ -18,6 +18,8 @@ from utils.blog_utils import load_blog_posts
 from utils.prompt_utils import set_obscurity, create_prompt
 from utils.config_utils import get_secrets
 from sqlalchemy.sql.expression import func
+from werkzeug.utils import secure_filename
+import csv
 
 
 from flask import Flask, render_template, request, abort
@@ -87,7 +89,10 @@ def add_or_update_book(data):
 def get_book_metadata(title, author, google_books_api_key):
     """Fetch metadata for a book using Google Books API."""
     # First check if book exists in database by title and author
-    book = Book.query.filter_by(title=title, author=author).first()
+    book = Book.query.filter(
+        Book.title == title,
+        Book.author.ilike(f"%{author}%")  # Case-insensitive partial match
+    ).first()
     if book:
         # Return existing book metadata
         return {
@@ -433,7 +438,9 @@ def logout():
 @login_required
 def my_account():
     user_books = UserBook.query.filter_by(user_id=current_user.id).all()
-    return render_template('my_account.html', user=current_user, user_books=user_books)
+    read_books = [user_book for user_book in user_books if user_book.status == 'read' and user_book.rating is not None]
+    average_rating = sum(user_book.rating for user_book in read_books) / len(read_books) if read_books else 0
+    return render_template('my_account.html', user=current_user, user_books=user_books, book_count=len(user_books), average_rating=average_rating)
 
 @app.route('/book/<string:isbn>')
 def book_page(isbn):
@@ -505,6 +512,137 @@ def search():
     logging.warning(all_book_metadata)
 
     return render_template('search.html', title=title, author=author, all_book_metadata=all_book_metadata)
+
+# Directory to store uploaded files (temporary)
+UPLOAD_FOLDER = 'uploads'
+ALLOWED_EXTENSIONS = {'csv'}
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Ensure the upload folder exists
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def add_book_to_user(title, author, status, isbn, rating):
+    logging.info(f"Adding book: {title}, {author}, {status}, {isbn}, {rating}")
+
+    user_book = UserBook.query.filter_by(user_id=current_user.id, book_isbn=isbn).first()
+    book = Book.query.get(str(isbn))
+
+    if not book:
+        # Add book to database
+        book_details = get_book_metadata(title=title, author=author, google_books_api_key=google_books_api_key)
+
+    if not user_book and book:  # We have book metadata but no user book
+        user_book = UserBook(user_id=current_user.id, book_isbn=isbn, status=status, rating=rating)
+        db.session.add(user_book)
+        db.session.commit()  # Save the book to the databas
+
+    logging.info(f"Adding book: {title}, {author}, {status}, {isbn}, {rating}")
+
+
+def map_goodreads_rating_to_text(goodreads_rating, custom_map=None):
+    # Default mapping
+    default_map = {
+        1: "Hated it",
+        2: "Didn't like it",
+        3: "It was OK",
+        4: "Liked it",
+        5: "Loved it"
+    }
+
+    # Use the custom map if provided
+    rating_map = custom_map or default_map
+
+    # Return the corresponding text
+    return rating_map.get(goodreads_rating, "No rating")
+
+
+@app.route('/upload_csv', methods=['POST'])
+def upload_csv():
+    logging.info("Processing CSV upload")
+    if 'goodreads_csv' not in request.files:
+        flash('No file part')
+        return redirect(url_for('my_account'))
+
+    file = request.files['goodreads_csv']
+
+    if file.filename == '':
+        flash('No selected file')
+        return redirect(url_for('my_account'))
+
+
+    if file and allowed_file(file.filename):
+        logging.info("File is valid")
+        filename = secure_filename(file.filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
+
+        # Process the CSV file
+        books_to_add = []
+        user_books_to_add = []
+        try:
+            with open(filepath, newline='', encoding='utf-8') as csvfile:
+                reader = csv.DictReader(csvfile)
+
+                for row in reader:
+                    logging.warning(f"Processing row: {row}")
+                    title = row.get('Title')
+                    author = row.get('Author')
+                    goodreads_status = row.get('Exclusive Shelf')
+                    status = 'read' if goodreads_status == 'read' else 'want_to_read' if goodreads_status == 'to-read' else None
+                    isbn = str(row.get('ISBN13').replace('=', '').replace('"', '').strip())
+                    rating = int(row.get('My Rating'))
+                    rating = map_goodreads_rating_to_text(goodreads_rating=rating)
+
+                    # Check if book exists in database
+                    book = Book.query.get(str(isbn))
+                    if not book:
+                        book_details = get_book_metadata(title=title, author=author, google_books_api_key=google_books_api_key)
+                        book = Book(
+                            isbn=isbn,
+                            title=book_details.get('title', title),
+                            author=book_details.get('authors', author),
+                            description=book_details.get('description', None),
+                            published_date=book_details.get('publishedDate', None),
+                            page_count=book_details.get('pageCount', 0),
+                            thumbnail=book_details.get('thumbnail', None),
+                            categories=book_details.get('categories', [])
+                        )
+                        books_to_add.append(book)
+
+                    user_book = UserBook.query.filter_by(user_id=current_user.id, book_isbn=isbn).first()
+                    if not user_book:
+                        user_books_to_add.append(UserBook(
+                            user_id=current_user.id,
+                            book_isbn=isbn,
+                            status=status,
+                            rating=rating
+                        ))
+
+                            # Batch insert
+                if books_to_add:
+                    db.session.bulk_save_objects(books_to_add)
+                    logging.info(f"Added {len(books_to_add)} new books to the database.")
+
+                if user_books_to_add:
+                    db.session.bulk_save_objects(user_books_to_add)
+                    logging.info(f"Added {len(user_books_to_add)} new user-book relationships.")
+
+                db.session.commit()
+                flash(f"Books successfully imported! {len(user_books_to_add)} books added to your library.", 'success')
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"Error processing CSV file: {str(e)}")
+            flash(f"Error processing CSV file: {str(e)}", 'error')
+        finally:
+            # Clean up the temporary file
+            if os.path.exists(filepath):
+                os.remove(filepath)
+            return redirect(url_for('my_account'))
 
 
 if __name__ == "__main__":
