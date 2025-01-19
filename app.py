@@ -90,7 +90,7 @@ def get_book_metadata(title, author, google_books_api_key):
     """Fetch metadata for a book using Google Books API."""
     # First check if book exists in database by title and author
     book = Book.query.filter(
-        Book.title == title,
+        Book.title.ilike(f"%{title}%"),
         Book.author.ilike(f"%{author}%")  # Case-insensitive partial match
     ).first()
     if book:

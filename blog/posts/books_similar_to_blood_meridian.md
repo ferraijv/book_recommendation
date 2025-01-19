@@ -1,5 +1,5 @@
 ---
-title: "The Top 8 Books Similar to *Blood Meridian*"
+title: "The Top 8 Books Similar to Blood Meridian"
 date: "2025-01-18"
 categories:
   - Literature
