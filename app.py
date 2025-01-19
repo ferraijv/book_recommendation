@@ -272,16 +272,18 @@ def reader_profile_form():
 @app.route("/generate-reader-profile", methods=["POST"])
 def generate_reader_profile():
     # Get user input from the form
-    genres = request.form.get("genres")[:500]
-    favorite_books = request.form.get("favorite_books")[:500]
-    reading_frequency = request.form.get("reading_frequency")[:500]
-    format = request.form.get("format")[:500]
-    reading_goals = request.form.get("reading_goals")[:500]
-    themes_to_avoid = request.form.get("themes_to_avoid")[:500]
-    mbti = request.form.get("mbti")  # Optional field
+    genres = request.form.get("genres", "")[:500]
+    favorite_books = request.form.get("favorite_books", "")[:500]
+    reading_frequency = request.form.get("reading_frequency", "")[:500]
+    format = request.form.get("format", "None Provided")[:500]
+    reading_goals = request.form.get("reading_goals", "")[:500]
+    themes_to_avoid = request.form.get("themes_to_avoid", "")[:500]
+    mbti = request.form.get("mbti", "")
 
     all_book_metadata = []
+
     try:
+        # Prepare input data for the API
         reader_profile_details = {
             "genres": genres,
             "favorite_books": favorite_books,
@@ -291,37 +293,47 @@ def generate_reader_profile():
             "themes_to_avoid": themes_to_avoid,
             "mbti": mbti
         }
+        
+        # Call the ChatGPT API with the input data
         analysis = get_reader_profile_recommendations(reader_profile_details, client)
-        logging.info(analysis)
-        analysis_html = markdown(analysis)  # Converts Markdown to HTML
-        logging.info(analysis_html)
+        logging.warning(f"Raw API Response: {analysis}")
+        
+        # Parse the structured JSON response
+        reader_profile = json.loads(analysis)
+        
+        # Extract components for rendering
+        personality_type = reader_profile.get("personality_type", "Unknown")
+        description = reader_profile.get("description", "No description provided.")
+        traits = reader_profile.get("traits", [])
+        suggested_books = reader_profile.get("suggested_books", [])
+
+        # Fetch metadata for each suggested book
+        for book in suggested_books:
+            try:
+                title = book.get("title", "Unknown Title")
+                author = book.get("author", "Unknown Author")
+                reason = book.get("description", "No reason provided")
+
+                book_details = get_book_metadata(title, author, google_books_api_key)
+                book_details["amazon_link"] = get_amazon_search_link(title, author)
+                book_details["reason"] = reason
+                if book_details.get("isbn"):
+                    all_book_metadata.append(book_details)
+            except Exception as e:
+                logging.error(f"Error fetching metadata for book '{title}': {str(e)}")
+
+        
+        # Render the template with the parsed data
+        return render_template(
+            "reader_profile_output.html",
+            personality_type=personality_type,
+            description=description,
+            traits=traits,
+            all_book_metadata=all_book_metadata
+        )
     except Exception as e:
-        analysis = f"Error generating profile: {str(e)}"
-        analysis_html = None
+        raise Exception(f"Error generating reader profile: {str(e)}")
 
-    books = identify_books(analysis)
-
-    shareable_text = analysis
-
-    for book in books:
-        logging.warning(book)
-        title = book["title"]
-        author = book["author"]
-
-        book_details = get_book_metadata(title, author, google_books_api_key)
-        book_details["amazon_link"] = get_amazon_search_link(title, author)
-        book_details["ga_event"] = f"Outbound Link: {title}"
-        if book_details.get("isbn"):
-            all_book_metadata.append(book_details)
-        logging.warning(book_details)
-
-    # Render the output page with the analysis
-    return render_template(
-        "reader_profile_output.html",
-        analysis_html=analysis_html,
-        shareable_text=analysis,
-        all_book_metadata=all_book_metadata
-    )
 
 
 @app.route("/blog")
@@ -408,9 +420,20 @@ def logout():
 @login_required
 def my_account():
     user_books = UserBook.query.filter_by(user_id=current_user.id).all()
-    read_books = [user_book for user_book in user_books if user_book.status == 'read' and user_book.rating is not None]
-    average_rating = sum(user_book.rating for user_book in read_books) / len(read_books) if read_books else 0
-    return render_template('my_account.html', user=current_user, user_books=user_books, book_count=len(user_books), average_rating=average_rating)
+    read_books = [ub for ub in user_books if ub.status == 'read']
+    want_to_read_books = [ub for ub in user_books if ub.status == 'want_to_read']
+    
+    average_rating = (sum(ub.rating for ub in read_books if ub.rating) / len(read_books)
+                      if read_books else 0)
+    
+    return render_template(
+        'my_account.html',
+        user=current_user,
+        user_books=user_books,
+        read_books_count=len(read_books),
+        want_to_read_count=len(want_to_read_books),
+        average_rating=average_rating
+    )
 
 @app.route('/book/<string:isbn>')
 def book_page(isbn):
@@ -430,12 +453,17 @@ def book_page(isbn):
     
     return render_template('book.html', book=book, similar_books=similar_books)
 
-@app.route('/read_books', methods=['GET'])
+@app.route('/read_books')
 @login_required
 def read_books():
-    # Fetch all UserBook entries for the current user
-    user_books = UserBook.query.filter_by(user_id=current_user.id).all()
-    return render_template('read_books.html', user_books=user_books)
+    read_books = UserBook.query.filter_by(user_id=current_user.id, status='read').all()
+    return render_template('read_books.html', books=read_books)
+
+@app.route('/want_to_read_books')
+@login_required
+def want_to_read_books():
+    want_to_read_books = UserBook.query.filter_by(user_id=current_user.id, status='want_to_read').all()
+    return render_template('want_to_read_books.html', books=want_to_read_books)
 
 
 @app.route('/under_construction')

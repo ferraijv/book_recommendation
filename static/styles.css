@@ -338,6 +338,10 @@ h2 {
     .navbar-search input {
         width: 200px;
     }
+    .blog-post-content {
+        padding: 0 15px; /* Reduce side padding on smaller screens */
+    }
+
 }
 .hero-content h1 {
     animation: fadeIn 2s ease-in-out;
@@ -1315,3 +1319,297 @@ textarea:focus {
     margin: 0 auto;  /* Center align */
     padding: 0 20px; /* Add padding for smaller screens */
 }
+
+
+/* General Styles for Book List Pages */
+.book-collection-list-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.book-collection-list-section h1 {
+    font-size: 28px;
+    margin-bottom: 24px;
+    color: #1a1a1a;
+    text-align: center;
+}
+
+.book-collection-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.book-collection-card {
+    display: flex;
+    flex-direction: column;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: box-shadow 0.2s ease;
+    text-align: center;
+}
+
+.book-collection-card:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.book-collection-thumbnail {
+    width: 100%;
+    object-fit: cover;
+    align-self: center;
+    background: #eaeaea;
+}
+
+.book-collection-info {
+    padding: 16px;
+}
+
+.book-collection-info h2 {
+    font-size: 20px;
+    margin: 8px 0;
+    color: #333;
+}
+
+.book-collection-info p {
+    font-size: 14px;
+    color: #666;
+    margin: 4px 0;
+}
+
+/* Buttons for Navigation (Optional) */
+.book-collection-btn-primary {
+    display: inline-block;
+    margin: 16px auto 0;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: 500;
+    color: white;
+    background-color: #4A90E2;
+    border: none;
+    border-radius: 4px;
+    text-align: center;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+
+.book-collection-btn-primary:hover {
+    background-color: #357ABD;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .book-collection-thumbnail {
+        height: 200px;
+    }
+
+    .book-collection-info h2 {
+        font-size: 18px;
+    }
+
+    .book-collection-info p {
+        font-size: 12px;
+    }
+}
+/* Add this to your CSS */
+:root {
+    --primary-color: #4A90E2;
+    --secondary-color: #2C3E50;
+    --background-color: #F5F7FA;
+    --text-color: #333;
+    --card-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    --border-radius: 12px;
+    --transition: all 0.3s ease;
+  }
+  
+  body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+  }
+  
+  .reader-profile-content {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+  }
+  
+  h2 {
+    font-size: 2.5rem;
+    color: var(--secondary-color);
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  h3 {
+    color: var(--primary-color);
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
+  
+  .reader-profile-content ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    list-style: none;
+    padding: 0;
+  }
+  
+  .reader-profile-content li {
+    background: var(--background-color);
+    padding: 0.5rem 1.5rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+  }
+  
+  .reader-profile-book-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    padding: 2rem 0;
+  }
+  
+  .reader-profile-book-card {
+    background: white;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    transition: var(--transition);
+  }
+  
+  .reader-profile-book-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  }
+  
+  .reader-profile-book-cover {
+    height: 300px;
+    overflow: hidden;
+  }
+  
+  .reader-profile-book-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .no-thumbnail {
+    height: 100%;
+    background: #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+  }
+  
+  .reader-profile-book-info {
+    padding: 1.5rem;
+  }
+  
+  .reader-profile-book-info h4 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: var(--secondary-color);
+  }
+  
+  .reader-profile-book-info p {
+    color: #666;
+    margin-bottom: 1rem;
+  }
+  
+  .reader-profile-book-info a {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background: var(--primary-color);
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: var(--transition);
+  }
+  
+  .reader-profile-book-info a:hover {
+    background: #357ABD;
+  }
+  
+  .reader-profile-share-section {
+    background: white;
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    margin: 2rem auto;
+    max-width: 1200px;
+  }
+  
+  .reader-profile-share-section textarea {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    resize: none;
+    margin-bottom: 1rem;
+    font-family: inherit;
+  }
+  
+  .reader-profile-share-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+  
+  .reader-profile-share-buttons button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: var(--transition);
+  }
+  
+  .reader-profile-share-buttons button:first-child {
+    background: #1DA1F2;
+    color: white;
+  }
+  
+  .reader-profile-share-buttons button:last-child {
+    background: #4267B2;
+    color: white;
+  }
+  
+  #copyButton {
+    background: var(--secondary-color);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  
+  #copyButton:hover {
+    opacity: 0.9;
+  }
+  
+  @media (max-width: 768px) {
+    .reader-profile-book-grid {
+      grid-template-columns: 1fr;
+      padding: 1rem;
+    }
+    
+    .reader-profile-share-buttons {
+      flex-direction: column;
+    }
+    
+    .reader-profile-content {
+      padding: 1rem;
+    }
+  }

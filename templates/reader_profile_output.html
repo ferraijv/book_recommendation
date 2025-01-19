@@ -1,37 +1,286 @@
 {% extends "base.html" %}
 
-{% block title %}SmartBookFinder - Reader Profile Input{% endblock %}
+{% block title %}SmartBookFinder - Reader Personality{% endblock %}
 
 {% block content %}
+    <div class="reader-profile-content">
         <h2>Your Reader Personality</h2>
-        <div class="profile-content">
-            {{ analysis_html | safe }}
-        </div>
-        <div class="share-section">
-            <h3>Share Your Reader Personality</h3>
-            <textarea id="shareableText" readonly rows="6" style="width: 100%; margin-bottom: 10px;">
-                {{ shareable_text | safe }}
-            </textarea>
-            <button id="copyButton">Copy to Clipboard</button>
-        </div>
-        <script>
-        document.getElementById("copyButton").addEventListener("click", function() {
-            const textArea = document.getElementById("shareableText");
-            textArea.select();
-            document.execCommand("copy");
-            alert("Reader Personality copied to clipboard!");
-        });
-        </script>
+        <h3>{{ personality_type }}</h3>
+        <p class="reader-profile-description">{{ description }}</p>
 
-        <div class="share-buttons">
-            <p>Share your Reader Personality:</p>
-            <a href="https://twitter.com/intent/tweet?text={{ shareable_text | urlencode }}" target="_blank">
-                <button>Share on Twitter</button>
-            </a>
-            <a href="https://www.facebook.com/sharer/sharer.php?u={{ url_for('generate_reader_profile', _external=True) }}" target="_blank">
-                <button>Share on Facebook</button>
-            </a>
+        <h4>Key Traits</h4>
+        <ul>
+            {% for trait in traits %}
+                <li>{{ trait }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="reader-profile-content">
+        <h3>Recommended Books for You</h3>
+        <div class="reader-profile-book-grid">
+            {% for book in all_book_metadata %}
+            <div class="reader-profile-book-card">
+                <div class="reader-profile-book-cover">
+                    {% if book.thumbnail %}
+                    <img src="{{ book.thumbnail }}" alt="{{ book.title }} cover" loading="lazy" onerror="this.src='/static/images/default-cover.jpg';">
+                    {% else %}
+                    <div class="no-thumbnail">
+                        <span>No Image Available</span>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="reader-profile-book-info">
+                    <h4>{{ book.title }}</h4>
+                    <p class="author">by {{ book.authors }}</p>
+                    <p class="reason">{{ book.reason }}</p>
+                    <a href="{{ book.amazon_link }}" target="_blank" rel="noopener">View on Amazon</a>
+                </div>
+            </div>
+            {% endfor %}
         </div>
     </div>
-    {% include 'display_books.html' %}
+
+    <div class="reader-profile-share-section">
+        <h3>Share Your Reader Personality</h3>
+        <textarea id="shareableText" readonly rows="4">My reader personality is {{ personality_type }}. {{ description }} Here are some books I recommend: {{ all_book_metadata | map(attribute='title') | join(', ') }}</textarea>
+        <button id="copyButton">Copy to Clipboard</button>
+    </div>
+
+    <div class="reader-profile-share-buttons">
+        <a href="https://twitter.com/intent/tweet?text=My reader personality is {{ personality_type }}. {{ description }} I recommend these books: {{ all_book_metadata | map(attribute='title') | join(', ') | urlencode }}" target="_blank" rel="noopener">
+            <button>Share on Twitter</button>
+        </a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u={{ url_for('generate_reader_profile', _external=True) }}" target="_blank" rel="noopener">
+            <button>Share on Facebook</button>
+        </a>
+    </div>
+
+    <script>
+    document.getElementById("copyButton").addEventListener("click", function() {
+        const textArea = document.getElementById("shareableText");
+        textArea.select();
+        navigator.clipboard.writeText(textArea.value).then(() => {
+            this.textContent = 'Copied!';
+            setTimeout(() => {
+                this.textContent = 'Copy to Clipboard';
+            }, 2000);
+        }).catch(() => {
+            document.execCommand("copy");
+            this.textContent = 'Copied!';
+            setTimeout(() => {
+                this.textContent = 'Copy to Clipboard';
+            }, 2000);
+        });
+    });
+    </script>
+    <style>
+        /* Add this to your CSS */
+:root {
+  --primary-color: #4A90E2;
+  --secondary-color: #2C3E50;
+  --background-color: #F5F7FA;
+  --text-color: #333;
+  --card-shadow: 0 2px 12px rgba(0,0,0,0.1);
+  --border-radius: 12px;
+  --transition: all 0.3s ease;
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  line-height: 1.6;
+}
+
+.reader-profile-content {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow);
+}
+
+h2 {
+  font-size: 2.5rem;
+  color: var(--secondary-color);
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+h3 {
+  color: var(--primary-color);
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+
+.reader-profile-content ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  list-style: none;
+  padding: 0;
+}
+
+.reader-profile-content li {
+  background: var(--background-color);
+  padding: 0.5rem 1.5rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+}
+
+.reader-profile-book-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  padding: 2rem 0;
+}
+
+.reader-profile-book-card {
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.reader-profile-book-cover {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  aspect-ratio: 2/3;  /* Maintain the standard book cover ratio */
+  width: 100%; /* Ensure full width in the container */
+  max-width: 200px; /* Optional: Limit the maximum width for consistency */
+  margin: 0 auto; /* Center the container itself */
+  overflow: hidden; /* Prevent any overflow from the image */
+  border-radius: 8px; /* Add some rounding for aesthetic */
+}
+
+.reader-profile-book-cover img {
+  width: auto; /* Allow width to adjust automatically */
+  transform: scale(2.5); /* Increase the size of the image slightly */
+  object-fit: contain; /* Ensure the entire image fits without being cut off */
+  border-radius: 8px; /* Match container's border radius */
+  display: block; /* Prevent inline spacing issues */
+}
+
+
+/* Optional: Add a subtle zoom effect on hover */
+.reader-profile-book-cover:hover img {
+  transform: scale(2.6);
+}
+
+/* For cases when there's no image */
+.reader-profile-no-thumbnail {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eee;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.reader-profile-book-info {
+  padding: 1.5rem;
+}
+
+.reader-profile-book-info h4 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  color: var(--secondary-color);
+}
+
+.reader-profile-book-info p {
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.reader-profile-book-info a {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background: var(--primary-color);
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: var(--transition);
+}
+
+.reader-profile-book-info a:hover {
+  background: #357ABD;
+}
+
+.reader-profile-share-section {
+  background: white;
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow);
+  margin: 2rem auto;
+  max-width: 1200px;
+}
+
+.reader-profile-share-section textarea {
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  resize: none;
+  margin-bottom: 1rem;
+  font-family: inherit;
+}
+
+.reader-profile-share-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.reader-profile-share-buttons button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.reader-profile-share-buttons button:first-child {
+  background: #1DA1F2;
+  color: white;
+}
+
+.reader-profile-share-buttons button:last-child {
+  background: #4267B2;
+  color: white;
+}
+
+#copyButton {
+  background: var(--secondary-color);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+#copyButton:hover {
+  opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+  .reader-profile-book-grid {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+  }
+  
+  .reader-profile-share-buttons {
+    flex-direction: column;
+  }
+  
+  .reader-profile-content {
+    padding: 1rem;
+  }
+}
+    </style>
 {% endblock %}

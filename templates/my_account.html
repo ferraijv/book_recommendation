@@ -18,116 +18,29 @@
         </div>
     </header>
 
-    <!-- Stats Grid -->
-    <div class="stats-section">
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-number">{{ book_count }}</div>
-                <div class="stat-label">Books Read</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">{{ average_rating }}</div>
-                <div class="stat-label">Average Rating</div>
-            </div>
-    </div>
-    <section class="upload-section">
-        <h2>Import Books from Goodreads</h2>
-        <form action="{{ url_for('upload_csv') }}" method="POST" enctype="multipart/form-data">
-            <label for="goodreads_csv" class="upload-label">Upload your Goodreads CSV file:</label>
-            <input type="file" name="goodreads_csv" id="goodreads_csv" accept=".csv" required>
-            <button type="submit" class="btn-primary">Upload</button>
-        </form>
-    </section>
 
-    <!-- Want to Read Section -->
-    <section class="reading-list-section">
-        <div class="section-header">
-            <h1>Want to Read</h1>
+<!-- Stats Grid -->
+<div class="stats-section">
+    <div class="stats-grid">
+        <div class="stat-card">
+            <button class="stat-number" onclick="window.location.href='{{ url_for('read_books') }}';">
+                {{ read_books_count }}
+            </button>
+            <div class="stat-label">Books Read</div>
         </div>
-        <div class="book-grid" id="book-list">
-            {% for user_book in user_books[:5] %} <!-- Show only the first 5 books initially -->
-            {% if user_book.status == "want_to_read" %}
-            <div class="book-card">
-                <div class="book-cover">
-                    {% if user_book.book.thumbnail %}
-                    <img src="{{ user_book.book.thumbnail }}" 
-                         alt="{{ user_book.book.title }} cover" 
-                         onerror="this.src='/static/images/default-cover.jpg';">
-                    {% else %}
-                    <div class="no-thumbnail">
-                        <span>No Image</span>
-                    </div>
-                    {% endif %}
-                </div>
-                <div class="book-info">
-                    <h2 class="book-title">{{ user_book.book.title }}</h2>
-                    <p class="book-author">{{ user_book.book.author }}</p>
-                    <p class="book-categories">{{ user_book.book.categories or "Not categorized" }}</p>
-                    <div class="book-actions">
-                        <form method="POST" action="{{ url_for('update_book_status', isbn=user_book.book.isbn) }}">
-                            <label for="status-{{ user_book.book.isbn }}"><strong>Status:</strong></label>
-                            <select id="status-{{ user_book.book.isbn }}" name="status">
-                                <option value="want_to_read" {% if user_book.status == "want_to_read" %}selected{% endif %}>
-                                    Want to Read
-                                </option>
-                                <option value="read" {% if user_book.status == "read" %}selected{% endif %}>
-                                    Read
-                                </option>
-                                <option value="wont_read" {% if user_book.status == "wont_read" %}selected{% endif %}>
-                                    Won't Read
-                                </option>
-                            </select>
-                            <button type="submit">Update</button>
-                        </form>                        
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-            {% endfor %}
-    
-            <!-- Additional books are hidden by default -->
-            <div id="hidden-books" style="display: none;">
-                {% for user_book in user_books[5:] %} <!-- Books after the first 5 -->
-                {% if user_book.status == "want_to_read" %}
-                <div class="book-card">
-                    <div class="book-cover">
-                        {% if user_book.book.thumbnail %}
-                        <img src="{{ user_book.book.thumbnail }}" 
-                             alt="{{ user_book.book.title }} cover" 
-                             onerror="this.src='/static/images/default-cover.jpg';">
-                        {% else %}
-                        <div class="no-thumbnail">
-                            <span>No Image</span>
-                        </div>
-                        {% endif %}
-                    </div>
-                    <div class="book-info">
-                        <h2 class="book-title">{{ user_book.book.title }}</h2>
-                        <p class="book-author">{{ user_book.book.author }}</p>
-                        <p class="book-categories">{{ user_book.book.categories or "Not categorized" }}</p>
-                        <div class="book-actions">
-                            <form method="POST" action="{{ url_for('update_book_status', isbn=user_book.book.isbn) }}">
-                                <label for="status-{{ user_book.book.isbn }}"><strong>Status:</strong></label>
-                                <select id="status-{{ user_book.book.isbn }}" name="status">
-                                    <option value="want_to_read">Want to Read</option>
-                                    <option value="read">Read</option>
-                                    <option value="wont_read">Won't Read</option>
-                                </select>
-                                <button type="submit">Update</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-                {% endfor %}
-            </div>
+        <div class="stat-card">
+            <button class="stat-number" onclick="window.location.href='{{ url_for('want_to_read_books') }}';">
+                {{ want_to_read_count }}
+            </button>
+            <div class="stat-label">Want to Read</div>
         </div>
-    
-        <!-- Expand/Collapse Button -->
-        <button id="toggle-books-btn" class="btn-primary" onclick="toggleBooks()">Show More</button>
-    </section>
-    
+        <div class="stat-card">
+            <div class="stat-number">{{ average_rating | round(2) }}</div>
+            <div class="stat-label">Average Rating</div>
+        </div>
+    </div>
 </div>
+
 
 <style>
     .account-page {
@@ -183,218 +96,66 @@
         margin-top: 2px;
     }
 
-    /* Stats Grid Styles */
-    .stats-section {
-        margin-bottom: 32px;
-    }
+   /* Stats Section Container */
+.stats-section {
+    margin: 24px 0;
+}
 
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 20px;
-    }
+/* Grid Layout for Stats */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+}
 
-    .stat-card {
-        background: white;
-        padding: 24px;
-        border-radius: 8px;
-        text-align: center;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
+/* Individual Stat Card */
+.stat-card {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
 
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Number Style */
+.stat-number {
+    font-size: 32px;
+    font-weight: bold;
+    color: #4a90e2;
+    background: none;
+    border: none;
+    cursor: pointer;
+    outline: none;
+    padding: 0;
+}
+
+.stat-number:hover {
+    text-decoration: underline;
+    color: #357ABD;
+}
+
+/* Label Style */
+.stat-label {
+    font-size: 16px;
+    color: #4a4a4a;
+    margin-top: 8px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
     .stat-number {
         font-size: 28px;
-        font-weight: 700;
-        color: #4A90E2;
-        margin-bottom: 8px;
-    }
-
-    .stat-label {
-        color: #666;
-        font-size: 14px;
-    }
-
-    /* Reading List Section Styles */
-    .reading-list-section {
-        background: white;
-        border-radius: 8px;
-        padding: 24px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-
-    .section-header {
-        margin-bottom: 24px;
-    }
-
-    .section-header h1 {
-        font-size: 24px;
-        color: #1a1a1a;
-        margin: 0;
-    }
-
-    .book-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-
-    .book-card {
-        display: flex;
-        gap: 20px;
-        padding: 20px;
-        border: 1px solid #eee;
-        border-radius: 8px;
-        transition: box-shadow 0.2s ease;
-    }
-
-    .book-card:hover {
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-/* Replace or update the existing .book-cover and related styles */
-
-.book-cover {
-    width: 200px; /* Adjust as needed for the desired size */
-    height: 300px; /* Adjust as needed for the desired size */
-    background: #f5f5f5;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-    overflow: hidden;
-    border: 1px solid #ddd; /* Optional: add a border for better visuals */
-}
-
-.book-cover img {
-    max-width: 100%; /* Force the image to fill the container width */
-    max-height: 100%; /* Force the image to fill the container height */
-    object-fit: contain; /* Crop the image proportionally to fit the container */
-    display: block; /* Ensure proper alignment inside the container */
-}
-
-
-
-
-.no-thumbnail {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #666;
-    font-size: 14px;
-    text-align: center;
-    border-radius: 4px;
-}
-
-/* Update mobile styles to maintain proper proportions */
-@media (max-width: 768px) {
-    .book-cover {
-        width: 180px;  /* Slightly wider on mobile */
-        margin: 0 auto 20px auto;
     }
     
-    .book-cover img,
-    .no-thumbnail {
-        height: 270px;  /* Adjusted for mobile */
-    }
-}
-
-    .book-info {
-        flex-grow: 1;
-    }
-
-    .book-title {
-        margin: 0 0 8px 0;
-        font-size: 18px;
-        color: #1a1a1a;
-    }
-
-    .book-author {
-        color: #4a4a4a;
-        margin: 0 0 4px 0;
-    }
-
-    .book-categories {
-        color: #666;
+    .stat-label {
         font-size: 14px;
-        margin: 0 0 16px 0;
     }
-
-    .book-actions {
-        display: flex;
-        gap: 12px;
-    }
-
-    .btn-primary {
-        background: #4A90E2;
-        color: white;
-        border: none;
-        padding: 8px 16px;
-        border-radius: 4px;
-        cursor: pointer;
-        font-weight: 500;
-        transition: background-color 0.2s ease;
-    }
-
-    .btn-primary:hover {
-        background: #357ABD;
-    }
-
-    .btn-secondary {
-        background: #f5f5f5;
-        color: #666;
-        border: 1px solid #ddd;
-        padding: 8px 16px;
-        border-radius: 4px;
-        cursor: pointer;
-        font-weight: 500;
-        transition: background-color 0.2s ease;
-    }
-
-    .btn-secondary:hover {
-        background: #e5e5e5;
-    }
-
-    @media (max-width: 768px) {
-        .book-card {
-            flex-direction: column;
-        }
-
-        .book-cover {
-            width: 100%;
-            max-width: 200px;
-            margin: 0 auto;
-        }
-
-        .book-actions {
-            flex-direction: column;
-        }
-
-        .btn-primary, .btn-secondary {
-            width: 100%;
-        }
-    }
-
-    .upload-section {
-    background: white;
-    border-radius: 8px;
-    padding: 24px;
-    margin-top: 24px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.upload-label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: bold;
-    color: #333;
-}
-
-input[type="file"] {
-    margin-bottom: 16px;
-}
-
-#hidden-books {
-    transition: max-height 0.3s ease-in-out;
-    overflow: hidden;
 }
 
 </style>
