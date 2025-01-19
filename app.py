@@ -468,8 +468,8 @@ def update_book_status(isbn):
 @app.route('/search', methods=['GET', 'POST'])
 def search():
 
-    title = request.args.get("title", None)
-    author = request.args.get("author", None)
+    title = request.form.get("title", None)
+    author = request.form.get("author", None)
 
     all_book_metadata = []  # Initialize an empty results list
 
@@ -478,6 +478,7 @@ def search():
     if title and author:  
 
         all_book_metadata = [get_book_metadata(title=title, author=author, google_books_api_key=google_books_api_key)]
+        logging.warning(all_book_metadata)
 
     logging.warning(all_book_metadata)
 

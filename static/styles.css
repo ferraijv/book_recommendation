@@ -1309,3 +1309,9 @@ textarea:focus {
     font-style: italic;
     color: #333;
 }
+
+.blog-post-content {
+    max-width: 800px; /* Optimal width for readability */
+    margin: 0 auto;  /* Center align */
+    padding: 0 20px; /* Add padding for smaller screens */
+}
