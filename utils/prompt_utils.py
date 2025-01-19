@@ -1,6 +1,6 @@
 import json
 import logging
-
+import re
 def set_obscurity(obscurity_level):
     # Adjust the prompt based on obscurity_level
     if obscurity_level <= 3:
@@ -80,22 +80,53 @@ def get_reader_profile_recommendations(reader_profile_details, client):
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": """Analyze the following reading preferences and habits, and create a "Reader Personality" profile. Don't include books they've already read in their suggestions. Return the output in structured Markdown format like this:
-
-                                                **Reader Personality Profile**: <Personality Name>  
-                                                **Description**: <Description of personality>  
-                                                **Traits**: <Description of personality traits>  
-                                                **Suggested Books/Themes**:  
-                                                1. <Book 1>  
-                                                2. <Book 2>  
-                                                3. <Book 3>  
-                                                4. <Book 4>
-                                                5. <Book 5>
-                                                """},
+                {"role": "system", "content": """You are an assistant generating personalized reader profiles based on user inputs. Analyze the given responses and create a **reader personality type** tailored to the user. Return the results in the following structured JSON format:
+                                                {
+                                                "personality_type": "<Name of the reader personality type (e.g., 'The Analytical Explorer')>",
+                                                "description": "<A brief description of this reader personality type, focusing on their reading habits, preferences, and motivations.>",
+                                                "traits": [
+                                                    "<Trait 1 (e.g., Analytical)>",
+                                                    "<Trait 2 (e.g., Curious)>",
+                                                    "<Trait 3 (e.g., Reflective)>",
+                                                    "<Trait 4 (e.g., Adventurous)>",
+                                                    "<Trait 5 (e.g., Thoughtful)>"
+                                                ],
+                                                "suggested_books": [
+                                                    {
+                                                    "title": "<Book Title 1>",
+                                                    "author": "<Author Name 1>",
+                                                    "description": "<Why this book is recommended for this reader personality type.>"
+                                                    },
+                                                    {
+                                                    "title": "<Book Title 2>",
+                                                    "author": "<Author Name 2>",
+                                                    "description": "<Why this book is recommended for this reader personality type.>"
+                                                    },
+                                                    {
+                                                    "title": "<Book Title 3>",
+                                                    "author": "<Author Name 3>",
+                                                    "description": "<Why this book is recommended for this reader personality type.>"
+                                                    },
+                                                    {
+                                                    "title": "<Book Title 4>",
+                                                    "author": "<Author Name 4>",
+                                                    "description": "<Why this book is recommended for this reader personality type.>"
+                                                    },
+                                                    {
+                                                    "title": "<Book Title 5>",
+                                                    "author": "<Author Name 5>",
+                                                    "description": "<Why this book is recommended for this reader personality type.>"
+                                                    }
+                                                ]
+                                                }"""},
                 {"role": "user", "content": prompt}
             ]
         )
         logging.warning(response)
         analysis = response.choices[0].message.content.strip()
 
-        return analysis
+        clean_response = re.sub(r"```(?:json)?", "", analysis).strip()
+
+        logging.warning(f"Analysis: {clean_response}")
+
+        return clean_response
