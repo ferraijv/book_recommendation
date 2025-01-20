@@ -12,14 +12,17 @@ import time
 from flask_sitemap import Sitemap
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, current_user, login_required
-from utils.db_utils import db, User, Book, UserBook
+from utils.db_utils import db, User, Book, UserBook, ReaderProfile
 from contextlib import contextmanager
 from utils.blog_utils import load_blog_posts
-from utils.prompt_utils import set_obscurity, create_prompt, get_book_recommendations, get_reader_profile_recommendations
+from utils.prompt_utils import set_obscurity, create_prompt, get_book_recommendations, get_reader_profile_recommendations, get_reader_profile_suggestions
 from utils.config_utils import get_secrets
 from sqlalchemy.sql.expression import func
 from werkzeug.utils import secure_filename
 import csv
+from flask import request, jsonify
+from sqlalchemy.exc import SQLAlchemyError
+from datetime import datetime
 
 
 from flask import Flask, render_template, request, abort
@@ -307,6 +310,29 @@ def generate_reader_profile():
         traits = reader_profile.get("traits", [])
         suggested_books = reader_profile.get("suggested_books", [])
 
+         # Check if a profile already exists for the user
+        if current_user.is_authenticated:
+            existing_profile = ReaderProfile.query.filter_by(user_id=current_user.id).first()
+
+            if existing_profile:
+                # Update the existing profile
+                existing_profile.personality_type = personality_type
+                existing_profile.description = description
+                existing_profile.traits = traits
+                existing_profile.updated_at = datetime.utcnow()
+            else:
+                # Create a new profile
+                new_profile = ReaderProfile(
+                    user_id=current_user.id,
+                    personality_type=personality_type,
+                    description=description,
+                    traits=traits
+                )
+                db.session.add(new_profile)
+
+            db.session.commit()
+
+
         # Fetch metadata for each suggested book
         for book in suggested_books:
             try:
@@ -329,7 +355,8 @@ def generate_reader_profile():
             personality_type=personality_type,
             description=description,
             traits=traits,
-            all_book_metadata=all_book_metadata
+            all_book_metadata=all_book_metadata,
+            user=current_user
         )
     except Exception as e:
         raise Exception(f"Error generating reader profile: {str(e)}")
@@ -416,24 +443,43 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
-@app.route('/my_account')
+@app.route('/my_account', methods=['GET'])
 @login_required
 def my_account():
+    # Fetch user books and stats
     user_books = UserBook.query.filter_by(user_id=current_user.id).all()
     read_books = [ub for ub in user_books if ub.status == 'read']
     want_to_read_books = [ub for ub in user_books if ub.status == 'want_to_read']
-    
-    average_rating = (sum(ub.rating for ub in read_books if ub.rating) / len(read_books)
-                      if read_books else 0)
-    
+    average_rating = sum(ub.rating for ub in read_books if ub.rating) / len(read_books) if read_books else 0
+
+    all_book_metadata = []
+
+    # Fetch reader profile
+    reader_profile = ReaderProfile.query.filter_by(user_id=current_user.id).first()
+
+    recommended_books = []
+    if reader_profile:
+        recommended_books = get_reader_profile_suggestions(reader_profile, client)
+
+        for book in recommended_books:
+            book_details = get_book_metadata(book["title"], book["author"], google_books_api_key)
+            book_details["amazon_link"] = get_amazon_search_link(book["title"], book["author"])
+            book_details["reason"] = book["reason"]
+            all_book_metadata.append(book_details)
+
+    logging.warning(f"All book metadata: {all_book_metadata}")
+
     return render_template(
         'my_account.html',
         user=current_user,
         user_books=user_books,
         read_books_count=len(read_books),
         want_to_read_count=len(want_to_read_books),
-        average_rating=average_rating
+        average_rating=average_rating,
+        reader_profile=reader_profile,
+        all_book_metadata=all_book_metadata
     )
+
 
 @app.route('/book/<string:isbn>')
 def book_page(isbn):
@@ -642,6 +688,35 @@ def upload_csv():
             if os.path.exists(filepath):
                 os.remove(filepath)
             return redirect(url_for('my_account'))
+
+
+@app.route('/save-reader-profile', methods=['POST'])
+def save_reader_profile():
+    try:
+        data = request.get_json()
+        user_id = data['user_id']
+        personality_type = data['personality_type']
+        description = data['description']
+        traits = data['traits']
+
+        # Save the profile to the database
+        profile = ReaderProfile(
+            user_id=user_id,
+            personality_type=personality_type,
+            description=description,
+            traits=traits,
+            created_at=datetime.utcnow(),
+            updated_at=datetime.utcnow()
+        )
+        db.session.add(profile)
+        db.session.commit()
+
+        return jsonify({'message': 'Reader profile saved successfully!'}), 201
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 if __name__ == "__main__":

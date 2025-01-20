@@ -18,7 +18,6 @@
         </div>
     </header>
 
-
 <!-- Stats Grid -->
 <div class="stats-section">
     <div class="stats-grid">
@@ -40,6 +39,53 @@
         </div>
     </div>
 </div>
+
+
+<div class="reader-profile-section">
+    {% if reader_profile %}
+    <div class="reader-profile-card">
+        <h3>Your Reader Personality</h3>
+        <p><strong>{{ reader_profile.personality_type }}</strong></p>
+        <p>{{ reader_profile.description }}</p>
+        <h4>Key Traits:</h4>
+        <ul class="reader-profile-traits">
+            {% for trait in reader_profile.traits %}
+            <li>{{ trait }}</li>
+            {% endfor %}
+        </ul>
+        <a href="{{ url_for('reader_profile_form') }}" class="btn-primary">Update Your Profile</a>
+    </div>
+    {% else %}
+    <div class="no-reader-profile">
+        <h3>You Haven't Created a Reader Profile Yet!</h3>
+        <p>Discover your reader personality and get tailored book recommendations.</p>
+        <a href="{{ url_for('reader_profile_form') }}" class="btn-primary">Create Your Profile</a>
+    </div>
+    {% endif %}
+</div>
+{% if all_book_metadata %}
+<div class="reader-profile-book-grid">
+    {% for book in all_book_metadata %}
+    <div class="reader-profile-book-card">
+            <div class="reader-profile-book-cover">
+                <a href="{{ url_for('book_page', isbn=book.isbn) }}" class="book-card-link">
+                {% if book.thumbnail %}
+                <img src="{{ book.thumbnail }}" alt="{{ book.title }} cover" loading="lazy">
+                {% else %}
+                <div class="no-thumbnail">No Image Available</div>
+                {% endif %}
+                </a>
+            </div>
+            <div class="reader-profile-book-info">
+                <h4>{{ book.title }}</h4>
+                <p>by {{ book.authors }}</p>
+                <p class="reason">{{ book.reason }}</p>
+                <a href="{{ book.amazon_link }}" target="_blank">View on Amazon</a>
+            </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
 
 
 <style>
@@ -158,36 +204,72 @@
     }
 }
 
-</style>
-
-<script>
-    function updateStatus(isbn, status) {
-        fetch(`/update_book_status/${isbn}`, {
-            method: 'POST',
-            body: JSON.stringify({ status: status }),
-            headers: { 'Content-Type': 'application/json' },
-        }).then(() => location.reload());
-    }
-
-    function removeBook(isbn) {
-        if (confirm('Are you sure you want to remove this book?')) {
-            // Add your remove book logic here
-        }
-    }
-
-function toggleBooks() {
-    const hiddenBooks = document.getElementById('hidden-books');
-    const toggleButton = document.getElementById('toggle-books-btn');
-
-    if (hiddenBooks.style.display === 'none' || hiddenBooks.style.display === '') {
-        hiddenBooks.style.display = 'block';
-        toggleButton.textContent = 'Show Less';
-    } else {
-        hiddenBooks.style.display = 'none';
-        toggleButton.textContent = 'Show More';
-    }
+.reader-profile-section {
+    margin-top: 24px;
+    padding: 16px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
 }
 
-    
-</script>
+.reader-profile-card {
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.reader-profile-card h3 {
+    color: #4a90e2;
+    margin-bottom: 10px;
+}
+
+.no-reader-profile h3 {
+    color: #e74c3c;
+    margin-bottom: 10px;
+}
+
+.reader-profile-card p,
+.no-reader-profile p {
+    color: #555;
+    margin-bottom: 20px;
+}
+
+.btn-primary {
+    display: inline-block;
+    padding: 10px 20px;
+    color: white;
+    background: #4a90e2;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-primary:hover {
+    background: #357ABD;
+}
+
+.reader-profile-traits {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.reader-profile-traits li {
+    background: #e6f7ff;
+    color: #007BFF;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+
+</style>
+
 {% endblock %}

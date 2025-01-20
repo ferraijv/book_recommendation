@@ -3,7 +3,14 @@
 {% block title %}SmartBookFinder - Reader Personality{% endblock %}
 
 {% block content %}
+
     <div class="reader-profile-content">
+        {% if not current_user.is_authenticated %}
+        <div class="login-notice">
+            <p>You must be logged in to save your Reader Personality profile and access personalized features.</p>
+            <a href="{{ url_for('login') }}" class="btn-primary">Log In</a>
+        </div>
+        {% endif %}
         <h2>Your Reader Personality</h2>
         <h3>{{ personality_type }}</h3>
         <p class="reader-profile-description">{{ description }}</p>
@@ -282,5 +289,30 @@ h3 {
     padding: 1rem;
   }
 }
+
+.login-notice {
+    margin: 1rem 0;
+    padding: 1rem;
+    background: #fff3cd; /* Light yellow background for warning */
+    color: #856404; /* Dark yellow text */
+    border: 1px solid #ffeeba;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.login-notice a {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 10px 20px;
+    background: #4A90E2;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.login-notice a:hover {
+    background: #357ABD;
+}
+
     </style>
 {% endblock %}

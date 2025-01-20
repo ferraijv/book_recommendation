@@ -2,13 +2,13 @@
 
 {% block content %}
 <!-- Example for read_books.html -->
-<div class="book-list-section">
+<div class="book-collection-list-section">
     <h1>Want to Read</h1>
-    <div class="book-grid">
+    <div class="book-collection-grid">
         {% for book in books %}
-        <div class="book-card">
+        <div class="book-collection-card">
             <a href="{{ url_for('book_page', isbn=book.book.isbn) }}">
-                <div class="book-thumbnail">
+                <div class="book-collection-thumbnail">
                     {% if book.book.thumbnail %}
                     <img src="{{ book.book.thumbnail }}" alt="{{ book.book.title }}" onerror="this.src='/static/images/default-cover.jpg';">
                     {% else %}
@@ -18,7 +18,7 @@
                 {% endif %}
             </div>
             </a>
-            <div class="book-info">
+            <div class="book-collection-info">
                 <h2>{{ book.book.title }}</h2>
                 <p>{{ book.book.author.replace("\"", '').replace("{", '').replace("}", '') }}</p>
             </div>

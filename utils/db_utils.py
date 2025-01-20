@@ -1,5 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
+from sqlalchemy.dialects.postgresql import JSONB
+from datetime import datetime
+
 
 db = SQLAlchemy()
 
@@ -46,3 +49,15 @@ class UserBook(db.Model):
     timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
     user = db.relationship('User', back_populates='read_books')
     book = db.relationship('Book', back_populates='read_by_users')
+
+    
+class ReaderProfile(db.Model):
+    __tablename__ = 'reader_profiles'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    personality_type = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    traits = db.Column(JSONB, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

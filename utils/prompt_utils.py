@@ -130,3 +130,51 @@ def get_reader_profile_recommendations(reader_profile_details, client):
         logging.warning(f"Analysis: {clean_response}")
 
         return clean_response
+
+def get_reader_profile_suggestions(reader_profile, client):
+             # Prepare API request payload
+    prompt = f"""
+    Based on the following reader profile, recommend 5 books that align with the reader's personality and preferences. Format your response as a **valid JSON array** with the following structure:
+    [
+        {{
+            "title": "Title of the book",
+            "author": "Author of the book",
+            "description": "A brief description of the book",
+            "reason": "Why this book is recommended for the user"
+        }},
+        {{
+            "title": "Title of the book",
+            "author": "Author of the book",
+            "description": "A brief description of the book",
+            "reason": "Why this book is recommended for the user"
+        }},
+        ... 3 more books
+    ]
+
+    ### Reader Profile:
+    - **Personality Type**: {reader_profile.personality_type}
+    - **Description**: {reader_profile.description}
+    - **Traits**: {', '.join(reader_profile.traits)}
+
+    ### Guidelines for the Response:
+    1. Ensure the JSON is strictly valid and free of syntax errors.
+    2. Double-check that each field is populated with meaningful and relevant information.
+    3. Avoid trailing commas or any invalid JSON formatting.
+    4. Do not include extra text outside of the JSON array.
+
+    Return only the JSON array in the response.
+    """
+    
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+        )
+        recommendations = response.choices[0].message.content.strip()
+        clean_response = re.sub(r"```(?:json)?", "", recommendations).strip()
+        logging.warning(f"Recommendations: {clean_response}")
+        recommended_books = json.loads(clean_response)  # Parse JSON response
+    except Exception as e:
+        logging.error(f"Error fetching recommendations: {str(e)}")
+
+    return recommended_books

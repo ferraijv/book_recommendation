@@ -1,0 +1,17 @@
+<div class="reader-profiles-list">
+    <h2>My Reader Profiles</h2>
+    <ul>
+        {% for profile in profiles %}
+        <li>
+            <h3>{{ profile.personality_type }}</h3>
+            <p>{{ profile.description }}</p>
+            <ul>
+                {% for trait in profile.traits %}
+                <li>{{ trait }}</li>
+                {% endfor %}
+            </ul>
+            <small>Created: {{ profile.created_at }}</small>
+        </li>
+        {% endfor %}
+    </ul>
+</div>

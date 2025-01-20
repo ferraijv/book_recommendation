@@ -209,12 +209,11 @@ h2 {
 .featured-post {
     border: 1px solid #ddd;
     border-radius: 10px;
-    padding: 15px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     background-color: #fff;
     margin-bottom: 20px;
     margin: 0 auto;
-    width: 95%;
+    width: 60%;
     text-align: center;
 }
 
@@ -1417,46 +1416,7 @@ textarea:focus {
         font-size: 12px;
     }
 }
-/* Add this to your CSS */
-:root {
-    --primary-color: #4A90E2;
-    --secondary-color: #2C3E50;
-    --background-color: #F5F7FA;
-    --text-color: #333;
-    --card-shadow: 0 2px 12px rgba(0,0,0,0.1);
-    --border-radius: 12px;
-    --transition: all 0.3s ease;
-  }
-  
-  body {
-    background-color: var(--background-color);
-    color: var(--text-color);
-    line-height: 1.6;
-  }
-  
-  .reader-profile-content {
-    max-width: 1200px;
-    margin: 2rem auto;
-    padding: 2rem;
-    background: white;
-    border-radius: var(--border-radius);
-    box-shadow: var(--card-shadow);
-  }
-  
-  h2 {
-    font-size: 2.5rem;
-    color: var(--secondary-color);
-    text-align: center;
-    margin-bottom: 2rem;
-  }
-  
-  h3 {
-    color: var(--primary-color);
-    font-size: 1.8rem;
-    margin-bottom: 1rem;
-  }
-  
-  .reader-profile-content ul {
+.reader-profile-content ul {
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
@@ -1479,36 +1439,47 @@ textarea:focus {
   }
   
   .reader-profile-book-card {
-    background: white;
-    border-radius: var(--border-radius);
     overflow: hidden;
-    box-shadow: var(--card-shadow);
     transition: var(--transition);
   }
   
-  .reader-profile-book-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-  }
-  
   .reader-profile-book-cover {
-    height: 300px;
-    overflow: hidden;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 2/3;  /* Maintain the standard book cover ratio */
+    width: 100%; /* Ensure full width in the container */
+    max-width: 200px; /* Optional: Limit the maximum width for consistency */
+    margin: 0 auto; /* Center the container itself */
+    overflow: hidden; /* Prevent any overflow from the image */
+    border-radius: 8px; /* Add some rounding for aesthetic */
   }
   
   .reader-profile-book-cover img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    width: auto; /* Allow width to adjust automatically */
+    transform: scale(2.5); /* Increase the size of the image slightly */
+    object-fit: contain; /* Ensure the entire image fits without being cut off */
+    border-radius: 8px; /* Match container's border radius */
+    display: block; /* Prevent inline spacing issues */
   }
   
-  .no-thumbnail {
+  
+  /* Optional: Add a subtle zoom effect on hover */
+  .reader-profile-book-cover:hover img {
+    transform: scale(2.6);
+  }
+  
+  /* For cases when there's no image */
+  .reader-profile-no-thumbnail {
+    width: 100%;
     height: 100%;
-    background: #eee;
     display: flex;
     align-items: center;
     justify-content: center;
+    background: #eee;
     color: #666;
+    font-size: 0.9rem;
   }
   
   .reader-profile-book-info {
@@ -1583,33 +1554,4 @@ textarea:focus {
   .reader-profile-share-buttons button:last-child {
     background: #4267B2;
     color: white;
-  }
-  
-  #copyButton {
-    background: var(--secondary-color);
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: var(--transition);
-  }
-  
-  #copyButton:hover {
-    opacity: 0.9;
-  }
-  
-  @media (max-width: 768px) {
-    .reader-profile-book-grid {
-      grid-template-columns: 1fr;
-      padding: 1rem;
-    }
-    
-    .reader-profile-share-buttons {
-      flex-direction: column;
-    }
-    
-    .reader-profile-content {
-      padding: 1rem;
-    }
   }
