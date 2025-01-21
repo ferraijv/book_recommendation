@@ -1555,3 +1555,78 @@ textarea:focus {
     background: #4267B2;
     color: white;
   }
+
+
+/* Search Bar Container */
+.navbar-search {
+    display: flex;
+    justify-content: center; /* Center the search bar */
+    position: relative;
+}
+
+/* Search Input Styling */
+#navbar-search {
+    width: 400px; /* Adjust as needed */
+    font-size: 1rem;
+}
+
+/* Autocomplete Results */
+#navbar-autocomplete-results {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 400px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* Autocomplete Items */
+.navbar-autocomplete-item {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.navbar-autocomplete-item a {
+    text-decoration: none;
+    color: #333;
+    display: block;
+    width: 100%;
+}
+
+.navbar-autocomplete-item:hover {
+    background-color: #f0f0f0;
+}
+
+/* Links Section */
+.navbar-links {
+    display: flex;
+    gap: 20px; /* Spacing between links */
+}
+
+.navbar-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 1rem;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.navbar-links a:hover {
+    background-color: #0056b3;
+}
+
+/* Responsive Design for Smaller Screens */
+@media (max-width: 768px) {
+    #navbar-search {
+        width: 250px; /* Adjust width for smaller screens */
+    }
+    .navbar-links {
+        display: none; /* Hide links or use a dropdown menu */
+    }
+}

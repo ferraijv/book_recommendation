@@ -319,6 +319,7 @@ def generate_reader_profile():
                 existing_profile.personality_type = personality_type
                 existing_profile.description = description
                 existing_profile.traits = traits
+                existing_profile.recommended_books = suggested_books
                 existing_profile.updated_at = datetime.utcnow()
             else:
                 # Create a new profile
@@ -326,7 +327,8 @@ def generate_reader_profile():
                     user_id=current_user.id,
                     personality_type=personality_type,
                     description=description,
-                    traits=traits
+                    traits=traits,
+                    recommended_books=suggested_books
                 )
                 db.session.add(new_profile)
 
@@ -458,16 +460,15 @@ def my_account():
     reader_profile = ReaderProfile.query.filter_by(user_id=current_user.id).first()
 
     recommended_books = []
+
     if reader_profile:
-        recommended_books = get_reader_profile_suggestions(reader_profile, client)
+        recommended_books = reader_profile.recommended_books
 
         for book in recommended_books:
             book_details = get_book_metadata(book["title"], book["author"], google_books_api_key)
             book_details["amazon_link"] = get_amazon_search_link(book["title"], book["author"])
             book_details["reason"] = book["reason"]
             all_book_metadata.append(book_details)
-
-    logging.warning(f"All book metadata: {all_book_metadata}")
 
     return render_template(
         'my_account.html',
@@ -698,6 +699,7 @@ def save_reader_profile():
         personality_type = data['personality_type']
         description = data['description']
         traits = data['traits']
+        recommended_books = data['recommended_books']
 
         # Save the profile to the database
         profile = ReaderProfile(
@@ -705,6 +707,7 @@ def save_reader_profile():
             personality_type=personality_type,
             description=description,
             traits=traits,
+            recommended_books=recommended_books,
             created_at=datetime.utcnow(),
             updated_at=datetime.utcnow()
         )
@@ -717,6 +720,25 @@ def save_reader_profile():
         return jsonify({'error': str(e)}), 500
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+
+@app.route('/autocomplete', methods=['GET'])
+def autocomplete():
+    query = request.args.get('query', '').strip().lower()
+    if not query:
+        return jsonify([])
+
+    results = (
+        Book.query
+        .filter(Book.search_data.op('@@')(func.plainto_tsquery('english', query)))
+        .limit(10)
+        .all()
+    )
+
+    return jsonify([
+        {"title": book.title, "author": book.author, "isbn": book.isbn}
+        for book in results
+    ])
 
 
 if __name__ == "__main__":

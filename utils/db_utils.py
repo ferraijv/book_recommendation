@@ -2,6 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from sqlalchemy.dialects.postgresql import JSONB
 from datetime import datetime
+from sqlalchemy.dialects.postgresql import TSVECTOR
 
 
 db = SQLAlchemy()
@@ -34,6 +35,8 @@ class Book(db.Model):
     thumbnail = db.Column(db.String(300), nullable=True)
     categories = db.Column(db.String(200), nullable=True)
     read_by_users = db.relationship('UserBook', back_populates='book')  # Define the relationship
+    search_data = db.Column(TSVECTOR)  # Add this line for full-text search
+
 
 
     def __repr__(self):
@@ -59,5 +62,6 @@ class ReaderProfile(db.Model):
     personality_type = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text, nullable=True)
     traits = db.Column(JSONB, nullable=True)
+    recommended_books = db.Column(JSONB, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

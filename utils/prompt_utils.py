@@ -95,27 +95,38 @@ def get_reader_profile_recommendations(reader_profile_details, client):
                                                     {
                                                     "title": "<Book Title 1>",
                                                     "author": "<Author Name 1>",
-                                                    "description": "<Why this book is recommended for this reader personality type.>"
+                                                    "description": "<Why this book is recommended for this reader personality type.>",
+                                                    "reason": "<Why this book is recommended for this reader personality type.>"
                                                     },
                                                     {
                                                     "title": "<Book Title 2>",
                                                     "author": "<Author Name 2>",
-                                                    "description": "<Why this book is recommended for this reader personality type.>"
+                                                    "description": "<Why this book is recommended for this reader personality type.>",
+                                                    "reason": "<Why this book is recommended for this reader personality type.>"
                                                     },
                                                     {
                                                     "title": "<Book Title 3>",
                                                     "author": "<Author Name 3>",
-                                                    "description": "<Why this book is recommended for this reader personality type.>"
+                                                    "description": "<Why this book is recommended for this reader personality type.>",
+                                                    "reason": "<Why this book is recommended for this reader personality type.>"
                                                     },
                                                     {
                                                     "title": "<Book Title 4>",
                                                     "author": "<Author Name 4>",
-                                                    "description": "<Why this book is recommended for this reader personality type.>"
+                                                    "description": "<Why this book is recommended for this reader personality type.>",
+                                                    "reason": "<Why this book is recommended for this reader personality type.>"
                                                     },
                                                     {
                                                     "title": "<Book Title 5>",
                                                     "author": "<Author Name 5>",
-                                                    "description": "<Why this book is recommended for this reader personality type.>"
+                                                    "description": "<Why this book is recommended for this reader personality type.>",
+                                                    "reason": "<Why this book is recommended for this reader personality type.>"
+                                                    },
+                                                    {
+                                                    "title": "<Book Title 6>",
+                                                    "author": "<Author Name 6>",
+                                                    "description": "<Why this book is recommended for this reader personality type.>",
+                                                    "reason": "<Why this book is recommended for this reader personality type.>"
                                                     }
                                                 ]
                                                 }"""},

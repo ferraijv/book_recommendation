@@ -25,6 +25,14 @@
         <a href="/">
             <img src="/static/images/book_logo.webp" alt="Logo" class="navbar-logo">
         </a>
+
+            <!-- Centered Search Bar -->
+        <div class="navbar-search">
+            <input type="text" id="navbar-search" placeholder="Search books..." autocomplete="off">
+            <div id="navbar-autocomplete-results"></div>
+        </div>
+
+
         <button class="hamburger-menu" onclick="toggleNavbar()">☰</button>
         <div class="navbar-links hidden">
             <a href="/">Home</a>
@@ -91,6 +99,28 @@
                 element.textContent = "See More"; // Update the link text
             }
         }
+
+        document.getElementById('navbar-search').addEventListener('input', async function () {
+        const query = this.value.trim();
+        const resultsDiv = document.getElementById('navbar-autocomplete-results');
+        resultsDiv.innerHTML = ''; // Clear previous results
+
+        if (query.length > 2) {
+            try {
+                const response = await fetch(`/autocomplete?query=${encodeURIComponent(query)}`);
+                const results = await response.json();
+
+                results.forEach(item => {
+                    const result = document.createElement('div');
+                    result.className = 'navbar-autocomplete-item';
+                    result.innerHTML = `<a href="/book/${item.isbn}">${item.title} by ${item.author}</a>`;
+                    resultsDiv.appendChild(result);
+                });
+            } catch (error) {
+                console.error('Error fetching autocomplete results:', error);
+            }
+        }
+    });
         </script>
         
 
