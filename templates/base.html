@@ -22,19 +22,24 @@
 <body>
     <!-- Shared Navigation -->
     <div class="navbar">
-        <a href="/">
+        <a href="/" class="navbar-brand">
             <img src="/static/images/book_logo.webp" alt="Logo" class="navbar-logo">
         </a>
 
-            <!-- Centered Search Bar -->
+
+        <!-- Centered Search Bar -->
         <div class="navbar-search">
             <input type="text" id="navbar-search" placeholder="Search books..." autocomplete="off">
             <div id="navbar-autocomplete-results"></div>
         </div>
-
-
-        <button class="hamburger-menu" onclick="toggleNavbar()">☰</button>
-        <div class="navbar-links hidden">
+    
+        <!-- Hamburger Menu -->
+        <button class="hamburger-menu" id="hamburger-menu" aria-label="Toggle navigation">
+            ☰
+        </button>
+    
+        <!-- Navigation Links -->
+        <div class="navbar-links" id="navbar-links">
             <a href="/">Home</a>
             <a href="/reader-profile">Reader Profile</a>
             <a href="/about">About</a>
@@ -42,13 +47,14 @@
             <a href="/community">Community</a>
             <a href="/search">Search</a>
             {% if current_user.is_authenticated %}
-                <a href="/my_account"> My Account </a>
+                <a href="/my_account">My Account</a>
                 <a href="{{ url_for('logout') }}">Logout</a>
             {% else %}
                 <a href="/login">Login/Register</a>
             {% endif %}
         </div>
     </div>
+    
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         <div class="container mt-4">
@@ -85,42 +91,66 @@
 
     <!-- Toggle Description Script -->
     <script>
-        function toggleDescription(element) {
-            const ellipsis = element.previousElementSibling.previousElementSibling; // Ellipsis span
-            const moreText = element.previousElementSibling; // Hidden text span
-        
-            if (moreText.style.display === "none") {
-                moreText.style.display = "inline"; // Show the rest of the text
-                ellipsis.style.display = "none"; // Hide the ellipsis
-                element.textContent = "See Less"; // Update the link text
-            } else {
-                moreText.style.display = "none"; // Hide the rest of the text
-                ellipsis.style.display = "inline"; // Show the ellipsis
-                element.textContent = "See More"; // Update the link text
-            }
-        }
+       // Improved navbar functionality
+document.addEventListener('DOMContentLoaded', () => {
+    const hamburger = document.getElementById('hamburger-menu');
+    const navLinks = document.getElementById('navbar-links');
+    const searchInput = document.getElementById('navbar-search');
+    const resultsDiv = document.getElementById('navbar-autocomplete-results');
+    
+    // Toggle menu visibility
+    hamburger.addEventListener('click', () => {
+        navLinks.classList.toggle('show');
+        const icon = hamburger.querySelector('.hamburger-icon');
+        icon.textContent = navLinks.classList.contains('show') ? '✕' : '☰'; // Change icon
+    });
 
-        document.getElementById('navbar-search').addEventListener('input', async function () {
-        const query = this.value.trim();
-        const resultsDiv = document.getElementById('navbar-autocomplete-results');
-        resultsDiv.innerHTML = ''; // Clear previous results
-
-        if (query.length > 2) {
-            try {
-                const response = await fetch(`/autocomplete?query=${encodeURIComponent(query)}`);
-                const results = await response.json();
-
-                results.forEach(item => {
-                    const result = document.createElement('div');
-                    result.className = 'navbar-autocomplete-item';
-                    result.innerHTML = `<a href="/book/${item.isbn}">${item.title} by ${item.author}</a>`;
-                    resultsDiv.appendChild(result);
-                });
-            } catch (error) {
-                console.error('Error fetching autocomplete results:', error);
-            }
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!navLinks.contains(e.target) && !hamburger.contains(e.target)) {
+            navLinks.classList.remove('show');
+            const icon = hamburger.querySelector('.hamburger-icon');
+            icon.textContent = '☰'; // Reset icon
         }
     });
+
+    // Search functionality with debouncing
+    let searchTimeout;
+    searchInput.addEventListener('input', () => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(async () => {
+            const query = searchInput.value.trim();
+            
+            if (query.length > 2) {
+                try {
+                    const response = await fetch(`/autocomplete?query=${encodeURIComponent(query)}`);
+                    const results = await response.json();
+                    
+                    resultsDiv.innerHTML = '';
+                    results.forEach(item => {
+                        const result = document.createElement('div');
+                        result.className = 'navbar-autocomplete-item';
+                        result.innerHTML = `<a href="/book/${item.isbn}">${item.title} by ${item.author}</a>`;
+                        resultsDiv.appendChild(result);
+                    });
+                    
+                    resultsDiv.classList.add('show');
+                } catch (error) {
+                    console.error('Error fetching results:', error);
+                }
+            } else {
+                resultsDiv.classList.remove('show');
+            }
+        }, 300);
+    });
+
+    // Close search results when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) {
+            resultsDiv.classList.remove('show');
+        }
+    });
+});
         </script>
         
 
@@ -132,3 +162,176 @@
     </footer>
 </body>
 </html>
+<style>
+.navbar {
+    background-color: #007bff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem; /* Adjust padding for mobile */
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 100%; /* Ensure it spans the full width */
+    box-sizing: border-box; /* Include padding in width calculation */
+}
+
+/* Logo styling */
+.navbar-logo {
+    height: 40px;
+    transition: transform 0.2s ease;
+}
+
+.navbar-logo:hover {
+    transform: scale(1.05);
+}
+
+/* Search bar improvements */
+.navbar-search {
+    position: relative;
+    max-width: 500px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+#navbar-search {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: none;
+    border-radius: 24px;
+    background-color: rgba(255, 255, 255, 0.9);
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#navbar-search:focus {
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    outline: none;
+}
+
+/* Search icon */
+.navbar-search::before {
+    content: '🔍';
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Autocomplete results styling */
+#navbar-autocomplete-results {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    max-height: 300px;
+    overflow-y: auto;
+    opacity: 0;
+    transform: translateY(-10px);
+    visibility: hidden;
+    transition: all 0.2s ease;
+}
+
+#navbar-autocomplete-results.show {
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+}
+
+.navbar-autocomplete-item {
+    padding: 0.75rem 1rem;
+    transition: background-color 0.2s ease;
+}
+
+.navbar-autocomplete-item:hover {
+    background-color: #f8f9fa;
+}
+
+.navbar-autocomplete-item a {
+    color: #333;
+    text-decoration: none;
+    display: block;
+}
+
+.navbar-links {
+    display: none; /* Show by default on larger screens */
+    gap: 1.5rem;
+    align-items: center;
+}
+
+/* When the 'show' class is added, show the links */
+.navbar-links.show {
+    display: flex; /* Make links visible */
+}
+
+
+.navbar-links.hidden {
+    display: none;
+}
+
+.navbar-links a {
+    color: white;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.navbar-links a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Hamburger menu */
+.hamburger-menu {
+    display: block;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: transform 0.2s ease;
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+    .navbar {
+        width: 100%;
+    }
+
+    .hamburger-menu {
+        display: block;
+    }
+
+    .navbar-links {
+        position: fixed;
+        top: 73px; /* Adjust based on your navbar height */
+        left: 0;
+        right: 0;
+        background-color: #007bff;
+        flex-direction: column;
+        padding: 1rem;
+        gap: 0.5rem;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+
+    .navbar-links.show {
+        transform: translateX(0);
+    }
+
+    .navbar-search {
+        max-width: none;
+        margin: 0 1rem;
+    }
+}
+</style>

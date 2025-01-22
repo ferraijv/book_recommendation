@@ -341,6 +341,36 @@ h2 {
         padding: 0 15px; /* Reduce side padding on smaller screens */
     }
 
+    .account-container {
+        margin: 10px;
+        padding: 1rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+    }
+
+    .stat-card {
+        padding: 1rem;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+    }
+
+    .navbar-search {
+        width: 250px;
+    }
+
+    #navbar-search {
+        width: 250px;
+    }
+
+    .navbar-links {
+        flex-direction: column;
+        gap: 10px;
+    }
 }
 .hero-content h1 {
     animation: fadeIn 2s ease-in-out;
@@ -1128,26 +1158,7 @@ textarea:focus {
     font-size: 0.9rem;
 }
 
-/* Mobile Responsiveness */
-@media (max-width: 768px) {
-    .account-container {
-        margin: 10px;
-        padding: 1rem;
-    }
 
-    .stats-grid {
-        grid-template-columns: 1fr;
-        gap: 0.8rem;
-    }
-
-    .stat-card {
-        padding: 1rem;
-    }
-
-    .stat-number {
-        font-size: 1.5rem;
-    }
-}
 
 .similar-books {
     margin-top: 3rem;
@@ -1621,12 +1632,3 @@ textarea:focus {
     background-color: #0056b3;
 }
 
-/* Responsive Design for Smaller Screens */
-@media (max-width: 768px) {
-    #navbar-search {
-        width: 250px; /* Adjust width for smaller screens */
-    }
-    .navbar-links {
-        display: none; /* Hide links or use a dropdown menu */
-    }
-}
