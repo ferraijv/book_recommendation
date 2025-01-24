@@ -145,9 +145,10 @@
 
 <style>
     .book-container {
-        max-width: 1200px;
-        margin: 2rem auto;
-        padding: 0 1rem;
+        max-width: 100%; /* Ensure it doesn’t exceed the viewport */
+        box-sizing: border-box; /* Include padding and borders in width calculations */
+        margin: 0 auto; /* Center the content */
+        padding: 0 15px; /* Add consistent spacing */
     }
 
     .book-header {
@@ -169,25 +170,29 @@
 
     .book-categories {
         display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-        justify-content: center;
-        margin-top: 1rem;
+        flex-wrap: wrap; /* Allow tags to wrap to the next line */
+        justify-content: flex-start; /* Align tags to the left */
+        gap: 0.5rem; /* Add spacing between tags */
+        padding: 0.5rem; /* Add padding to prevent cutoff */
+        overflow: hidden; /* Prevent content overflow */
     }
 
     .category-tag {
         background-color: #e2e8f0;
-        padding: 0.3rem 0.8rem;
+        max-width: 100%; /* Ensure tags don't exceed container width */
+        padding: 0.3rem 0.8rem; /* Adjust padding for readability */
         border-radius: 15px;
-        font-size: 0.9rem;
-        color: #4a5568;
+        text-align: center; /* Center-align the text inside tags */
+        white-space: nowrap; /* Prevent tags from breaking text to a new line */
+        overflow: hidden; /* Prevent text overflow */
+        text-overflow: ellipsis; /* Add ellipsis for overflowing text */
     }
 
+
     .book-details {
-        display: grid;
-        grid-template-columns: 300px 1fr;
-        gap: 2rem;
-        margin-bottom: 2rem;
+        max-width: 100%; /* Prevent the details section from overflowing */
+        overflow: hidden; /* Contain any child element overflow */
+        padding: 0 1rem; /* Add padding for better spacing */
     }
 
     .book-image {
@@ -330,11 +335,11 @@
 
     @media (max-width: 768px) {
         .book-details {
-            grid-template-columns: 1fr;
+            grid-template-columns: 1fr; /* Single column on small screens */
         }
 
         .book-image {
-            max-width: 300px;
+            max-width: 100%; /* Ensure the image doesn’t exceed the container width */
             margin: 0 auto;
         }
 
@@ -345,6 +350,21 @@
 
         .rating-select, .status-select {
             margin: 0.5rem 0;
+        }
+
+        .category-tag {
+            font-size: 0.8rem; /* Reduce font size */
+            display: hidden;
+            padding: 0.2rem 0.6rem; /* Adjust padding */
+            max-width: 100%; /* Ensure tags don't exceed container width */
+            overflow: hidden; /* Prevent text overflow */
+            text-overflow: ellipsis; /* Add ellipsis for overflowing text */
+            white-space: nowrap; /* Prevent text from breaking to a new line */
+        }
+
+        .book-categories {
+            justify-content: center; /* Center tags on small screens */
+            display: none;
         }
     }
 </style>

@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}{{ post.metadata.title }} - My Blog{% endblock %}
+{% block title %}{{ post.metadata.title }}{% endblock %}
 
 {% block meta_description %}
-<meta name="description" content="{{ post.metadata.description or post.content[:150] }}">
+{{ post.metadata.description[:150] }}
 {% endblock %}
 
 
@@ -14,3 +14,26 @@
     <div>{{ post.content | safe }}</div>
 </div>
 {% endblock %}
+<script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "BlogPosting",
+      "headline": "{{ post.metadata.title or 'SmartBookFinder Blog' }}",
+      "description": "{{ post.metadata.description[:150] or 'SmartBookFinder Blog' }}",
+      "datePublished": "{{ post.metadata.date or '2025-01-01' }}",
+      "author": {
+        "@type": "Person",
+        "name": "{{ post.metadata.author or 'Jacob Ferraiolo' }}"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "SmartBookFinder Blog",
+      },
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "{{ request.url }}"
+      }
+    }
+    </script>
+        
+    

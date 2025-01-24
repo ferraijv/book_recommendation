@@ -256,7 +256,7 @@ def index():
     .join(UserBook, Book.isbn == UserBook.book_isbn)
     .group_by(Book)
     .order_by(func.count(UserBook.book_isbn).desc())
-    .limit(5)
+    .limit(6)
     .all())
 
     return render_template("index.html", all_book_metadata=all_book_metadata, popular_books=popular_books)
@@ -495,7 +495,7 @@ def book_page(isbn):
         similar_books = Book.query.filter(
             Book.categories.op('&&')([main_category]),  # Check if the array overlaps with the main category
             Book.isbn != isbn  # Exclude current book
-        ).order_by(func.random()).limit(5).all()
+        ).order_by(func.random()).limit(6).all()
     
     
     return render_template('book.html', book=book, similar_books=similar_books)

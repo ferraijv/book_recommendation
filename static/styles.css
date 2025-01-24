@@ -2,6 +2,13 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     line-height: 1.6;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 h1 {
@@ -11,7 +18,7 @@ h1 {
 
 img {
     background: none;
-    max-width: 25%;
+    max-width: 80%;
 }
 
 textarea {
@@ -21,7 +28,9 @@ textarea {
 
 p {
     margin: 20px;
+    word-wrap: break-word;
 }
+
 
 button {
     background-color: #007bff;
@@ -53,7 +62,6 @@ h2 {
     top: 0; /* Stick to the top of the viewport */
     z-index: 1000; /* Ensure it stays above other elements */
     width: 100%; /* Extend the navbar's width to 100% of the viewport */
-    box-sizing: border-box; /* Include padding in the element's total width */
 }
 
 
@@ -83,6 +91,7 @@ h2 {
     width: 100%;
     background-color: #007bff;
     padding: 10px 0;
+    z-index: 1001;
 }
 
 .navbar-links.hidden {
@@ -94,6 +103,7 @@ h2 {
     text-decoration: none;
     padding: 10px 20px;
     font-size: 1rem;
+    z-index: 1000;
 }
 
 .navbar a:hover {
@@ -292,6 +302,16 @@ h2 {
         height: 300px;
     }
 
+    .navbar-logo {
+        width: 50px; /* Slightly larger for visibility on mobile */
+        height: auto; /* Maintain aspect ratio */
+    }
+
+
+    p {
+        margin: 10px;
+    }
+
     .hero-content h1 {
         font-size: 1.8rem;
     }
@@ -304,7 +324,7 @@ h2 {
         font-size: 1rem;
         padding: 8px 16px;
     }
-    .container {
+    .container .blog-post-content {
         max-width: 750px;
         margin: 0 auto;
     }
@@ -363,13 +383,32 @@ h2 {
         width: 250px;
     }
 
+    .navbar-search input {
+        width: 90%; /* Scale search bar width */
+        font-size: 1rem; /* Adjust text size */
+    }
+
     #navbar-search {
         width: 250px;
     }
 
+    .navbar {
+        padding: 5px 10px; /* Reduce padding on smaller screens */
+        justify-content: space-around; /* Adjust spacing of navbar items */
+        display: flex;
+        box-sizing: border-box; /* Include padding in the element's total width */
+        overflow-x: hidden; /* Ensure no overflow */
+    }
+
     .navbar-links {
-        flex-direction: column;
-        gap: 10px;
+        flex-direction: column; /* Stack links vertically */
+        align-items: center; /* Center-align links */
+        width: 100%; /* Ensure links fit within the navbar */
+    }
+
+
+    .hamburger-menu {
+        font-size: 1.5rem; /* Adjust menu size */
     }
 }
 .hero-content h1 {
@@ -1458,12 +1497,12 @@ textarea:focus {
     position: relative;
     display: flex;
     justify-content: center;
+    object-fit: fill;
     align-items: center;
     aspect-ratio: 2/3;  /* Maintain the standard book cover ratio */
     width: 100%; /* Ensure full width in the container */
-    max-width: 200px; /* Optional: Limit the maximum width for consistency */
+    max-width: 100%; /* Optional: Limit the maximum width for consistency */
     margin: 0 auto; /* Center the container itself */
-    overflow: hidden; /* Prevent any overflow from the image */
     border-radius: 8px; /* Add some rounding for aesthetic */
   }
   
@@ -1618,6 +1657,8 @@ textarea:focus {
 .navbar-links {
     display: flex;
     gap: 20px; /* Spacing between links */
+    max-width: 100%;
+    z-index: 1001;
 }
 
 .navbar-links a {
