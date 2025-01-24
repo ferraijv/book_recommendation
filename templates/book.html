@@ -1,6 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}Book - {{ book.title }}{% endblock %}
+{% block title %}{{ book.title }} by {{ book.author.replace("{", "").replace("}", "").replace("\"", "") }} | Book Summary{% endblock %}
+
+
+{% block meta_description %}
+    {{ book.title }} by {{ book.author.replace("{", "").replace("}", "").replace("\"", "") }} - {{ book.description[:150] }}
+{% endblock %}
+
 
 {% block content %}
 <div class="book-container">
@@ -24,7 +30,7 @@
     <div class="book-details">
         <div class="book-image">
             {% if book.thumbnail %}
-                <img src="{{ book.thumbnail }}" alt="Book Cover of {{ book.title }}" class="book-cover">
+                <img src="{{ book.thumbnail }}" alt="Book Cover of {{ book.title }}" class="book-cover" loading="lazy">
             {% else %}
                 <div class="no-cover">
                     <span>No cover available</span>
@@ -107,30 +113,30 @@
         {% endif %}
     </div>
 <!-- Similar Books Section -->
-{% if similar_books %}
-<div class="similar-books">
-    <h2>Similar Books You Might Like</h2>
-    <div class="similar-books-grid">
-        {% for similar_book in similar_books %}
-        <a href="{{ url_for('book_page', isbn=similar_book.isbn) }}" class="similar-book-card">
-            <div class="similar-book-image">
-                {% if similar_book.thumbnail %}
-                    <img src="{{ similar_book.thumbnail }}" alt="{{ similar_book.title }}">
-                {% else %}
-                    <div class="no-cover">
-                        <span>No cover available</span>
-                    </div>
-                {% endif %}
-            </div>
-            <div class="similar-book-info">
-                <h3>{{ similar_book.title }}</h3>
-                <p>{{ similar_book.author.replace("{", "").replace("}", "").replace("\"", "") }}</p>
-            </div>
-        </a>
-        {% endfor %}
+    {% if similar_books %}
+    <div class="similar-books">
+        <h2>Similar Books You Might Like</h2>
+        <div class="similar-books-grid">
+            {% for similar_book in similar_books %}
+            <a href="{{ url_for('book_page', isbn=similar_book.isbn) }}" class="similar-book-card">
+                <div class="similar-book-image">
+                    {% if similar_book.thumbnail %}
+                        <img src="{{ similar_book.thumbnail }}" alt="{{ similar_book.title }}" loading="lazy">
+                    {% else %}
+                        <div class="no-cover">
+                            <span>No cover available</span>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="similar-book-info">
+                    <h3>{{ similar_book.title }}</h3>
+                    <p>{{ similar_book.author.replace("{", "").replace("}", "").replace("\"", "") }}</p>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
     </div>
-</div>
-{% endif %}
+    {% endif %}
     <!-- Back to Home with enhanced styling -->
     <div class="back-to-home">
         <a href="{{ url_for('index') }}" class="back-link">← Back to Home</a>
@@ -360,4 +366,20 @@ function toggleDescription(button) {
     }
 }
 </script>
+<script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "Book",
+      "name": "{{ book.title|escape }}",
+      "author": {
+        "@type": "Person",
+        "name": "{{ book.author|escape }}"
+      },
+      "isbn": "{{ book.isbn|default('Unknown') }}",
+      "datePublished": "{{ book.published_date|default('Unknown') }}",
+      "image": "{{ book.thumbnail|default('https://example.com/default-cover.jpg') }}",
+      "description": "{{ book.description[:200]|escape }}"
+    }
+</script>
+    
 {% endblock %}
