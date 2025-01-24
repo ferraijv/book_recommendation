@@ -1,6 +1,7 @@
 ---
 title: "Books to Help You Understand Food Safety Policy: Red Dye 3 and Beyond"
 date: "2025-01-16"
+description: "Books to Help You Understand Food Safety Policy: Red Dye 3 and Beyond"
 categories:
   - Food Policy
   - FDA

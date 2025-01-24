@@ -2,6 +2,7 @@
 title: "Best Books Similar to Murder on the Orient Express"
 date: "2025-01-03"
 img: https://m.media-amazon.com/images/I/81QbgfCoVXL._SY522_.jpg
+description: "Best Books Similar to Murder on the Orient Express"
 categories:
     - book recommendation
 ---

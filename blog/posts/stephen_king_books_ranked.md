@@ -2,6 +2,7 @@
 title: "Top Stephen King Books Ranked: A Guide for Horror and Thriller Fans"
 date: "2025-01-17"
 img: https://m.media-amazon.com/images/I/51ImsilVpvL._SY445_SX342_PQ1_.jpg
+description: "Top Stephen King Books Ranked: A Guide for Horror and Thriller Fans"
 categories: 
   - stephen king
   - horror

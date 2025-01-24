@@ -1,6 +1,7 @@
 ---
 title: "Best Books to Understand Firefighting"
 date: "2025-01-14"
+description: "Best Books to Understand Firefighting"
 img: https://m.media-amazon.com/images/I/41mc0JNHyGL._SY445_SX342_PQ1_.jpg
 ---
 # The Best Books to Understand Firefighting: From the Fireline to Policy

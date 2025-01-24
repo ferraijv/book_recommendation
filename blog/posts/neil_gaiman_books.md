@@ -2,6 +2,7 @@
 title: "Exploring the Best of Neil Gaiman: Books You Shouldn't Miss"
 date: "2025-01-17"
 img: https://m.media-amazon.com/images/I/81vOoc2NhoL._SY522_.jpg
+description: "Exploring the Best of Neil Gaiman: Books You Shouldn't Miss"
 categories: 
   - neil gaiman
   - fantasy

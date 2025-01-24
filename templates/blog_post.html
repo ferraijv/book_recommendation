@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Home - My Blog{% endblock %}
+{% block title %}{{ post.metadata.title }} - My Blog{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="{{ post.metadata.description or post.content[:150] }}">
+{% endblock %}
+
 
 {% block content %}
 <div class="blog-post-content">

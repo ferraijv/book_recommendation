@@ -5,6 +5,7 @@ categories:
   - Behavioral Economics
   - Risk Management
   - Philosophy
+description: "Books Similar to The Black Swan: Understanding Risk and Uncertainty"
 img: https://m.media-amazon.com/images/I/51urVNmy8EL._SY522_.jpg
 ---
 

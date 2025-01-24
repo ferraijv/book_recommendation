@@ -1,6 +1,11 @@
 ---
 title: "Best Books to Understand the TikTok Ban"
 date: "2025-01-14"
+categories:
+  - TikTok
+  - Social Media
+  - Data Privacy
+description: "Best Books to Understand the TikTok Ban"
 img: https://m.media-amazon.com/images/I/41XJUXNBuhL._SY445_SX342_PQ1_.jpg
 ---
 # Books to Help You Understand the Implications of a TikTok Ban
