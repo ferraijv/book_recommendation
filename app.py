@@ -450,7 +450,7 @@ def logout():
 def my_account():
     # Fetch user books and stats
     user_books = UserBook.query.filter_by(user_id=current_user.id).all()
-    read_books = [ub for ub in user_books if ub.status == 'read']
+    read_books = [ub for ub in user_books if ub.status == 'finished']
     want_to_read_books = [ub for ub in user_books if ub.status == 'want_to_read']
     average_rating = sum(ub.rating for ub in read_books if ub.rating) / len(read_books) if read_books else 0
 
@@ -503,7 +503,7 @@ def book_page(isbn):
 @app.route('/read_books')
 @login_required
 def read_books():
-    read_books = UserBook.query.filter_by(user_id=current_user.id, status='read').all()
+    read_books = UserBook.query.filter_by(user_id=current_user.id, status='finished').all()
     return render_template('read_books.html', books=read_books)
 
 @app.route('/want_to_read_books')
@@ -521,11 +521,22 @@ def under_construction():
 @app.route('/update_book_status/<string:isbn>', methods=['POST'])
 @login_required
 def update_book_status(isbn):
+
+    RATING_MAP = {
+        "Hated it": 1,
+        "Did not like it": 2,
+        "It was ok": 3,
+        "Liked it": 4,
+        "Loved it": 5
+    }
     # Get the book
     book = Book.query.get_or_404(isbn)
 
     # Get the selected status from the form
     status = request.form.get('status')
+    rating_text = request.form.get('rating')
+    rating = RATING_MAP.get(rating_text, None)  # Map rating text to integer, default to None
+
 
     # Find or create the UserBook entry
     user_book = UserBook.query.filter_by(user_id=current_user.id, book_isbn=isbn).first()
@@ -535,7 +546,10 @@ def update_book_status(isbn):
 
     # Update the status
     user_book.status = status
+    user_book.rating = rating
     db.session.commit()
+
+    logging.warning(f"Updating book {book.title} to status: {status} with rating: {rating}")
 
     flash(f'Status for "{book.title}" updated to "{status.replace("_", " ").title()}"!', 'success')
     return redirect(url_for('index'))  # Redirect back to the book list

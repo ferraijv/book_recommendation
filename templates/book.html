@@ -13,10 +13,6 @@
     <!-- Book Header with enhanced styling -->
     <div class="book-header">
         <h1 class="book-title">{{ book.title }}</h1>
-        <p class="book-author">
-            <strong>Author:</strong> 
-            {{ book.author.replace("{", "").replace("}", "").replace("\"", "") }}
-        </p>
         {% if book.categories %}
         <div class="book-categories">
             {% for category in book.categories %}
@@ -49,6 +45,10 @@
 
         <div class="book-info">
             <div class="info-grid">
+                <div class="info-item">
+                    <strong>Author:</strong> 
+                    {{ book.author.replace("{", "").replace("}", "").replace("\"", "") }}
+                </div>
                 <div class="info-item">
                     <strong>ISBN:</strong>
                     <span>{{ book.isbn }}</span>
@@ -90,7 +90,6 @@
                         <option value="It was ok">It was ok</option>
                         <option value="Liked it">Liked it</option>
                         <option value="Loved it">Loved it</option>
-                        <option value="Amazing">Amazing</option>
                     </select>
                 </div>
 
@@ -99,7 +98,6 @@
                     <select name="status" id="status" class="status-select">
                         <option value="">-- Select Status --</option>
                         <option value="want_to_read">Want to Read</option>
-                        <option value="currently_reading">Currently Reading</option>
                         <option value="finished">Finished</option>
                     </select>
                 </div>
@@ -334,8 +332,14 @@
     }
 
     @media (max-width: 768px) {
+
         .book-details {
             grid-template-columns: 1fr; /* Single column on small screens */
+
+        }
+
+        .book-author {
+            overflow: hidden;
         }
 
         .book-image {
@@ -354,7 +358,7 @@
 
         .category-tag {
             font-size: 0.8rem; /* Reduce font size */
-            display: hidden;
+            display: none;
             padding: 0.2rem 0.6rem; /* Adjust padding */
             max-width: 100%; /* Ensure tags don't exceed container width */
             overflow: hidden; /* Prevent text overflow */

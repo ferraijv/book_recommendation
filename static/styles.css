@@ -390,6 +390,7 @@ h2 {
 
     #navbar-search {
         width: 250px;
+        z-index: 1050;
     }
 
     .navbar {
@@ -397,7 +398,6 @@ h2 {
         justify-content: space-around; /* Adjust spacing of navbar items */
         display: flex;
         box-sizing: border-box; /* Include padding in the element's total width */
-        overflow-x: hidden; /* Ensure no overflow */
     }
 
     .navbar-links {
@@ -410,6 +410,34 @@ h2 {
     .hamburger-menu {
         font-size: 1.5rem; /* Adjust menu size */
     }
+
+    #navbar-autocomplete-results {
+        position: absolute;
+        max-width: 100%;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%; /* Adjust width to fit the screen */
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        z-index: 1060;
+        max-height: 300px; /* Increase height slightly for readability */
+        overflow: auto;
+        font-size: 0.9rem; /* Smaller font for mobile */
+    }
+
+    .navbar-autocomplete-item {
+        padding: 8px; /* Slightly smaller padding */
+        font-size: 0.9rem; /* Adjust text size */
+        cursor: pointer;
+        justify-content: center;
+        text-align: left; /* Ensure proper alignment */
+        z-index: 1070;
+    }
+
+
 }
 .hero-content h1 {
     animation: fadeIn 2s ease-in-out;
@@ -488,6 +516,8 @@ textarea, input[type="text"] {
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: inline;
+    flex-wrap: wrap; /* Allow items to wrap to the next line */
 }
 
 .book-header {
@@ -1106,6 +1136,7 @@ textarea:focus {
     border: 1px solid #ccc;
     border-radius: 4px 0 0 4px;
     outline: none;
+    z-index: 1050;
 }
 
 .navbar-search button {
@@ -1618,6 +1649,7 @@ textarea:focus {
 #navbar-search {
     width: 400px; /* Adjust as needed */
     font-size: 1rem;
+    z-index: 1000;
 }
 
 /* Autocomplete Results */
@@ -1631,15 +1663,17 @@ textarea:focus {
     border: 1px solid #ccc;
     border-radius: 4px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
+    z-index: 1050;
     max-height: 200px;
-    overflow-y: auto;
+    overflow: auto;
 }
 
 /* Autocomplete Items */
 .navbar-autocomplete-item {
     padding: 10px;
     cursor: pointer;
+    justify-content: center;
+    z-index: 1050;
 }
 
 .navbar-autocomplete-item a {
