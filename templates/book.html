@@ -110,6 +110,43 @@
             </div>
         {% endif %}
     </div>
+
+    <div class="spotify-info">
+        <h3>Spotify Audiobook Availability</h3>
+        {% if spotify_audiobook %}
+          <div class="spotify-audiobook-details">
+            <p><strong>Title:</strong> {{ spotify_audiobook.name }}</p>
+            <a href="{{ spotify_audiobook.external_urls.spotify }}" target="_blank" class="spotify-link">
+              <button class="spotify-button">Listen on Spotify</button>
+            </a>
+          </div>
+        {% else %}
+          <p class="spotify-not-available">No audiobook available on Spotify for this title.</p>
+        {% endif %}
+      </div>
+
+      <div class="podcast-episodes">
+        <h3>Podcast Episodes Related to "{{ book.title }}"</h3>
+        {% if podcast_episodes %}
+          <ul class="podcast-list">
+            {% for episode in podcast_episodes %}
+              <li class="podcast-item">
+                <div class="podcast-info">
+                  <h4>{{ episode.name }}</h4>
+                  <p>{{ episode.description[:200] }}...</p>
+                  <a href="{{ episode.external_urls.spotify }}" target="_blank" class="spotify-link">
+                    Listen on Spotify
+                  </a>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p>No related podcast episodes found on Spotify.</p>
+        {% endif %}
+      </div>
+      
+
 <!-- Similar Books Section -->
     {% if similar_books %}
     <div class="similar-books">
@@ -371,6 +408,106 @@
             display: none;
         }
     }
+
+    .spotify-info {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.spotify-info h3 {
+    font-size: 1.5rem;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.spotify-audiobook-details {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.spotify-audiobook-details p {
+    margin: 0.5rem 0;
+    font-size: 1rem;
+    color: #555;
+}
+
+.spotify-link {
+    text-decoration: none;
+}
+
+.spotify-button {
+    background-color: #1DB954; /* Spotify green */
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 1rem;
+}
+
+.spotify-button:hover {
+    background-color: #14833B;
+}
+
+.spotify-not-available {
+    font-size: 1rem;
+    color: #666;
+    text-align: center;
+}
+
+.podcast-episodes {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.podcast-episodes h3 {
+    font-size: 1.5rem;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+}
+
+.podcast-list {
+    list-style: none;
+    padding: 0;
+}
+
+.podcast-item {
+    margin-bottom: 1.5rem;
+}
+
+.podcast-info h4 {
+    font-size: 1.2rem;
+    margin: 0 0 0.5rem;
+}
+
+.podcast-info p {
+    margin: 0 0 1rem;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.spotify-link {
+    color: #1DB954;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.spotify-link:hover {
+    color: #14833B;
+}
+
+
 </style>
 
 <script>

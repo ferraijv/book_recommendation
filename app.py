@@ -17,6 +17,7 @@ from contextlib import contextmanager
 from utils.blog_utils import load_blog_posts
 from utils.prompt_utils import set_obscurity, create_prompt, get_book_recommendations, get_reader_profile_recommendations, get_reader_profile_suggestions
 from utils.config_utils import get_secrets
+from utils.spotify_utils import get_audiobook_details, search_spotify_podcasts
 from sqlalchemy.sql.expression import func
 from werkzeug.utils import secure_filename
 import csv
@@ -157,6 +158,7 @@ openai_api_key_raw = get_secrets("openai_api_key")
 google_books_api_key_raw = get_secrets("google_books_api")
 postgres_url = get_secrets("postgres_url")['postgres_url']
 flask_secret_key = get_secrets("flask_secret_key")['flask_secret_key']
+spotify_credentials = get_secrets("spotify_credentials")
 
 # Extract the OpenAI API key from the secret
 openai_api_key = openai_api_key_raw['api_key']
@@ -496,9 +498,20 @@ def book_page(isbn):
             Book.categories.op('&&')([main_category]),  # Check if the array overlaps with the main category
             Book.isbn != isbn  # Exclude current book
         ).order_by(func.random()).limit(6).all()
+
+    spotify_audiobook = get_audiobook_details(spotify_credentials['client_id'], spotify_credentials['client_secret'], book.title, book.author) 
+
+    podcast_episodes = search_spotify_podcasts(book.title, book.author, spotify_credentials['client_id'], spotify_credentials['client_secret'])
+
+    logging.warning(f"{spotify_audiobook}")
     
-    
-    return render_template('book.html', book=book, similar_books=similar_books)
+    return render_template(
+        'book.html', 
+        book=book, 
+        similar_books=similar_books, 
+        spotify_audiobook=spotify_audiobook,
+        podcast_episodes=podcast_episodes
+        )
 
 @app.route('/read_books')
 @login_required
