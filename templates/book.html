@@ -125,6 +125,23 @@
         {% endif %}
       </div>
 
+      <div class="libby-info">
+        <h3>Is {{ book.title }} available on Libby?</h3>
+        {% if libby_availability %}
+          <div class="libby-availability-details">
+            <p><strong>Title:</strong> {{ book.title }}</p>
+            <p><strong>Status:</strong> Available on Libby!</p>
+            <a href="https://libbyapp.com/search/{{ book.title|urlencode }}+{{ book.author|urlencode }}" 
+               target="_blank" 
+               class="libby-link">
+              <button class="libby-button">Borrow on Libby</button>
+            </a>
+          </div>
+        {% else %}
+          <p class="libby-not-available">Libby Integration is under development. Check back soon</p>
+        {% endif %}
+    </div>
+
       <div class="podcast-episodes">
         <h3>Podcast Episodes Related to "{{ book.title }}"</h3>
         {% if podcast_episodes %}
@@ -506,6 +523,60 @@
 .spotify-link:hover {
     color: #14833B;
 }
+
+.libby-info {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.libby-info h3 {
+    font-size: 1.5rem;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.libby-availability-details {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.libby-availability-details p {
+    margin: 0.5rem 0;
+    font-size: 1rem;
+    color: #555;
+}
+
+.libby-link {
+    text-decoration: none;
+}
+
+.libby-button {
+    background-color: #FF9900; /* Libby orange */
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 1rem;
+}
+
+.libby-button:hover {
+    background-color: #CC7A00;
+}
+
+.libby-not-available {
+    font-size: 1rem;
+    color: #666;
+    text-align: center;
+}
+
 
 
 </style>
