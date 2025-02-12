@@ -1531,16 +1531,13 @@ textarea:focus {
     object-fit: fill;
     align-items: center;
     aspect-ratio: 2/3;  /* Maintain the standard book cover ratio */
-    width: 100%; /* Ensure full width in the container */
-    max-width: 100%; /* Optional: Limit the maximum width for consistency */
     margin: 0 auto; /* Center the container itself */
     border-radius: 8px; /* Add some rounding for aesthetic */
   }
   
   .reader-profile-book-cover img {
     width: auto; /* Allow width to adjust automatically */
-    transform: scale(2.5); /* Increase the size of the image slightly */
-    object-fit: contain; /* Ensure the entire image fits without being cut off */
+    object-fit: fill; /* Ensure the entire image fits without being cut off */
     border-radius: 8px; /* Match container's border radius */
     display: block; /* Prevent inline spacing issues */
   }

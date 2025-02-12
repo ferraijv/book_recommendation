@@ -67,7 +67,7 @@
 <div class="reader-profile-book-grid">
     {% for book in all_book_metadata %}
     <div class="reader-profile-book-card">
-            <div class="reader-profile-book-cover">
+            <div class="book-thumbnail">
                 <a href="{{ url_for('book_page', title_slug=book.title|generate_slug, isbn=book.isbn) }}" class="book-card-link">
                 {% if book.thumbnail %}
                 <img src="{{ book.thumbnail }}" alt="{{ book.title }} cover" loading="lazy">
