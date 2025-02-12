@@ -147,6 +147,7 @@
         {% if podcast_episodes %}
           <ul class="podcast-list">
             {% for episode in podcast_episodes %}
+            {% if episode.name and "download" not in episode.name.lower()  and "audiobook" not in episode.name.lower() %}
               <li class="podcast-item">
                 <div class="podcast-info">
                   <h4>{{ episode.name }}</h4>
@@ -156,6 +157,7 @@
                   </a>
                 </div>
               </li>
+              {% endif %}
             {% endfor %}
           </ul>
         {% else %}
@@ -170,7 +172,7 @@
         <h2>Similar Books You Might Like</h2>
         <div class="similar-books-grid">
             {% for similar_book in similar_books %}
-            <a href="{{ url_for('book_page', isbn=similar_book.isbn) }}" class="similar-book-card">
+            <a href="{{ url_for('book_page', title_slug=similar_book.title|generate_slug, isbn=similar_book.isbn) }}" class="similar-book-card">
                 <div class="similar-book-image">
                     {% if similar_book.thumbnail %}
                         <img src="{{ similar_book.thumbnail }}" alt="{{ similar_book.title }}" loading="lazy">

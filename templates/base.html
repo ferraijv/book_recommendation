@@ -14,20 +14,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <title>{% block title %}My Blog{% endblock %}</title>
+    
     <meta name="description" content="{% block meta_description %}Default description for SmartBookFinder.{% endblock %}">
 
-        <!-- Open Graph Metadata -->
-        <meta property="og:title" content="{% block og_title %}Default OG Title{% endblock %}">
-        <meta property="og:description" content="{% block og_description %}Default OG description.{% endblock %}">
-        <meta property="og:image" content="{% block og_image %}/static/images/default-image.png{% endblock %}">
-        <meta property="og:url" content="{% block og_url %}https://smartbookfinder.com{% endblock %}">
-    
-        <!-- Twitter Metadata -->
-        <meta name="twitter:card" content="{% block twitter_card %}summary_large_image{% endblock %}">
-        <meta name="twitter:title" content="{% block twitter_title %}Default Twitter Title{% endblock %}">
-        <meta name="twitter:description" content="{% block twitter_description %}Default Twitter description.{% endblock %}">
-        <meta name="twitter:image" content="{% block twitter_image %}/static/images/default-image.png{% endblock %}">
-    
+    <!-- Open Graph Metadata -->
+    <meta property="og:title" content="{% block og_title %}Default OG Title{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Personalized book recommendations{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}/static/images/default-image.png{% endblock %}">
+    <meta property="og:url" content="{% block og_url %}https://smartbookfinder.com{% endblock %}">
 
     <link rel="stylesheet" href="/static/styles.css">
     <link rel="canonical" href="https://smartbookfinder.com{{ request.path }}" />

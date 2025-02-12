@@ -24,6 +24,7 @@ import csv
 from flask import request, jsonify
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
+import re
 
 
 from flask import Flask, render_template, request, abort
@@ -180,6 +181,13 @@ db.init_app(app)
 sitemap = Sitemap(app=app)
 app.config['SITEMAP_URL_SCHEME'] = "https"
 
+def generate_slug(title):
+    """Generate a slug from the book title"""
+    return re.sub(r'[^a-zA-Z0-9]+', '-', title.lower()).strip('-')
+
+app.jinja_env.filters['generate_slug'] = generate_slug
+
+
 from flask_login import LoginManager
 
 login_manager = LoginManager()
@@ -187,7 +195,7 @@ login_manager.login_view = 'login'  # Redirect unauthorized users to the login p
 
 @login_manager.user_loader
 def load_user(user_id):
-    return db.session.get(User, int(user_id))  # No explicit transaction management
+    return db.session.get(User, int(user_id))  
 
 
 login_manager.init_app(app)
@@ -484,34 +492,49 @@ def my_account():
     )
 
 
-@app.route('/book/<string:isbn>')
-def book_page(isbn):
+
+
+@app.route('/book/<string:title_slug>-<string:isbn>')
+def book_page(title_slug, isbn):
     # Get main book
     book = Book.query.get_or_404(isbn)
     
+    # Ensure the slug matches the book's title
+    expected_slug = generate_slug(book.title)
+    if title_slug != expected_slug:
+        return redirect(url_for('book_page', title_slug=expected_slug, isbn=isbn), 301)
+
     # Get similar books based on categories
     similar_books = []
     if book.categories:
-        # Use the first category from the array
         main_category = book.categories[0]
         similar_books = Book.query.filter(
-            Book.categories.op('&&')([main_category]),  # Check if the array overlaps with the main category
-            Book.isbn != isbn  # Exclude current book
+            Book.categories.op('&&')([main_category]), 
+            Book.isbn != isbn
         ).order_by(func.random()).limit(6).all()
 
-    spotify_audiobook = get_audiobook_details(spotify_credentials['client_id'], spotify_credentials['client_secret'], book.title, book.author) 
-
+    spotify_audiobook = get_audiobook_details(spotify_credentials['client_id'], spotify_credentials['client_secret'], book.title, book.author)
     podcast_episodes = search_spotify_podcasts(book.title, book.author, spotify_credentials['client_id'], spotify_credentials['client_secret'])
 
-    logging.warning(f"{spotify_audiobook}")
-    
     return render_template(
         'book.html', 
         book=book, 
         similar_books=similar_books, 
         spotify_audiobook=spotify_audiobook,
         podcast_episodes=podcast_episodes
-        )
+    )
+
+@app.route('/book/<string:isbn>')
+def old_book_page(isbn):
+    # Fetch book by ISBN
+    book = Book.query.get_or_404(isbn)
+
+    # Generate the new SEO-friendly URL
+    new_url = url_for('book_page', title_slug=generate_slug(book.title), isbn=isbn)
+
+    # Redirect with a 301 status code (permanent redirect)
+    return redirect(new_url, 301)
+
 
 @app.route('/read_books')
 @login_required

@@ -68,7 +68,7 @@ Find your next favorite book with SmartBookFinder. Get personalized recommendati
     <div class="popular-books-grid">
         {% for book, count in popular_books %}
         <div class="popular-book-card">
-            <a href="{{ url_for('book_page', isbn=book.isbn) }}" class="popular-book-link">
+            <a href="{{ url_for('book_page', title_slug=book.title|generate_slug, isbn=book.isbn) }}" class="popular-book-link">
                 <div class="popular-book-image">
                     {% if book.thumbnail %}
                     <img src="{{ book.thumbnail }}" alt="{{ book.title }}">

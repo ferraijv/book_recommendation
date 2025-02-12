@@ -15,7 +15,6 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(200), nullable=False)
     read_books = db.relationship('UserBook', back_populates='user')  # Define the relationship
 
-
     def set_password(self, password):
         from werkzeug.security import generate_password_hash
         self.password_hash = generate_password_hash(password, method='pbkdf2:sha256')
