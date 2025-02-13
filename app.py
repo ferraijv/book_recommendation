@@ -21,7 +21,7 @@ from utils.spotify_utils import get_audiobook_details, search_spotify_podcasts
 from sqlalchemy.sql.expression import func
 from werkzeug.utils import secure_filename
 import csv
-from flask import request, jsonify
+from flask import request, jsonify, send_from_directory
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
 import re
@@ -789,6 +789,10 @@ def autocomplete():
         {"title": book.title, "author": book.author, "isbn": book.isbn}
         for book in results
     ])
+
+@app.route("/robots.txt")
+def robots_txt():
+    return send_from_directory(os.path.abspath(os.path.dirname(__file__)), "robots.txt", mimetype="text/plain")
 
 
 if __name__ == "__main__":

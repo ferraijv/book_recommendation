@@ -1,0 +1,19 @@
+User-agent: *
+Disallow: /login
+Disallow: /register
+Disallow: /my_account
+Disallow: /under_construction
+Disallow: /uploads
+Disallow: /admin
+Disallow: /search?q=*
+Allow: /
+Allow: /reader-profile
+
+# Allow Googlebot to index book pages, blog, and reader profile
+User-agent: Googlebot
+Allow: /book/
+Allow: /blog/
+Allow: /reader-profile
+
+# Sitemap Location
+Sitemap: https://www.smartbookfinder.com/sitemap.xml
