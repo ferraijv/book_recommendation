@@ -5,7 +5,11 @@ from markdown2 import markdown, Markdown
 
 BLOG_DIR = "blog/posts"
 
-def load_blog_posts():
+def load_blog_posts() -> list[dict]:
+    """
+    Loads all blog posts from the blog directory and returns them as a list of dictionaries.
+    Each dictionary contains the metadata and the HTML content of the post.
+    """
     posts = []
     for filename in os.listdir(BLOG_DIR):
         if filename.endswith(".md"):

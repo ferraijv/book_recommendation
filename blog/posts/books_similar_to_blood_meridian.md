@@ -5,6 +5,7 @@ categories:
   - Literature
   - Westerns
   - Historical Fiction
+description: "The Top 8 Books Similar to Blood Meridian"
 img: https://m.media-amazon.com/images/I/41GuWgTvzoL._SY445_SX342_PQ1_.jpg
 ---
 

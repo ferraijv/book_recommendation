@@ -4,7 +4,8 @@
     {% for book in all_book_metadata %}
     <div class="book-container">
         <div class="book">
-            <a href="/book/{{ book.isbn }}"><h3>{{ book.title }}</h3></a>
+            <a href="{{ url_for('book_page', title_slug=generate_slug(book.title), isbn=book.isbn) }}">
+                <h3>{{ book.title }}</h3></a>
             {% if book.thumbnail and book.amazon_link %}
             <div class="book-thumbnail">
                 <a href="{{ book.amazon_link }}" target="_blank" data-ga-event="{{ book.ga_event }}">
@@ -13,7 +14,8 @@
             </div>
             {% elif book.thumbnail %}
                 <div class="book-thumbnail">
-                    <a href="/book/{{ book.isbn }}"><img src="{{ book.thumbnail }}" alt="Book cover"></a>
+                    <a href="{{ url_for('book_page', title_slug=generate_slug(book.title), isbn=book.isbn) }}">
+                        <img src="{{ book.thumbnail }}" alt="Book cover"></a>
                 </div>
             {% endif %}
             <p><strong>Authors:</strong> {{ book.authors if book.authors else "N/A" }}</p>
