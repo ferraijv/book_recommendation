@@ -288,44 +288,11 @@ def blog_post(post_title):
 
 @app.route('/book/<string:title_slug>-<string:isbn>')
 def book_page(title_slug, isbn):
-    # Get main book
-    book = Book.query.get_or_404(isbn)
-    
-    # Ensure the slug matches the book's title
-    expected_slug = generate_slug(book.title)
-    if title_slug != expected_slug:
-        return redirect(url_for('book_page', title_slug=expected_slug, isbn=isbn), 301)
-
-    # Get similar books based on categories
-    similar_books = []
-    if book.categories:
-        main_category = book.categories[0]
-        similar_books = Book.query.filter(
-            Book.categories.op('&&')([main_category]), 
-            Book.isbn != isbn
-        ).order_by(func.random()).limit(6).all()
-
-    spotify_audiobook = get_audiobook_details(spotify_credentials['client_id'], spotify_credentials['client_secret'], book.title, book.author)
-    podcast_episodes = search_spotify_podcasts(book.title, book.author, spotify_credentials['client_id'], spotify_credentials['client_secret'])
-
-    return render_template(
-        'book.html', 
-        book=book, 
-        similar_books=similar_books, 
-        spotify_audiobook=spotify_audiobook,
-        podcast_episodes=podcast_episodes
-    )
+    return render_template('404.html'), 404
 
 @app.route('/book/<string:isbn>')
 def old_book_page(isbn):
-    # Fetch book by ISBN
-    book = Book.query.get_or_404(isbn)
-
-    # Generate the new SEO-friendly URL
-    new_url = url_for('book_page', title_slug=generate_slug(book.title), isbn=isbn)
-
-    # Redirect with a 301 status code (permanent redirect)
-    return redirect(new_url, 301)
+    return render_template('404.html'), 404
 
 @app.route('/under_construction')
 def under_construction():
