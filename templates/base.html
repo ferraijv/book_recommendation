@@ -36,12 +36,6 @@
             <img src="/static/images/book_logo.webp" alt="Logo" class="navbar-logo">
         </a>
 
-
-        <!-- Centered Search Bar -->
-        <div class="navbar-search">
-            <input type="text" id="navbar-search" placeholder="Search books..." autocomplete="off">
-            <div id="navbar-autocomplete-results"></div>
-        </div>
     
         <!-- Hamburger Menu -->
         <button class="hamburger-menu" id="hamburger-menu" aria-label="Toggle navigation">
@@ -54,14 +48,6 @@
             <a href="/reader-profile">Reader Profile</a>
             <a href="/about">About</a>
             <a href="/blog">Blog</a>
-            <a href="/community">Community</a>
-            <a href="/search">Search</a>
-            {% if current_user.is_authenticated %}
-                <a href="/my_account">My Account</a>
-                <a href="{{ url_for('logout') }}">Logout</a>
-            {% else %}
-                <a href="/login">Login/Register</a>
-            {% endif %}
         </div>
     </div>
     

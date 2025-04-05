@@ -33,83 +33,8 @@ from flask import Flask, render_template, request, abort
 import logging
 
 
-def add_or_update_book(data):
-    """
-    Adds a new book or updates an existing book in the database.
-
-    Args:
-        data (dict): A dictionary containing book details, including:
-                     - isbn (required)
-                     - title (required)
-                     - author (required)
-                     - description (optional)
-                     - published_date (optional)
-                     - page_count (optional)
-                     - thumbnail (optional)
-
-    Returns:
-        Book: The added or updated Book object.
-    """
-    logging.warning("Starting add_or_update_book")
-    isbn = data.get('isbn')
-    if isbn and (not isbn.isdigit() or len(isbn) != 13):
-        logging.error("ISBN must be a 13-digit number")
-        return None
-    if not isbn:
-        logging.error("ISBN is required to add a book")
-        return None
-    if not data.get('title'):
-        logging.error("Title is required to add a book")
-        return None
-    if not data.get('authors'):
-        logging.error("Author is required to add a book")
-        return None
-
-    try:
-        # Check if the book already exists
-        book = Book.query.get(str(isbn))  # Ensure ISBN is passed as a string
-        if not book:
-            logging.info(f"Adding new book with ISBN: {isbn}")
-            book = Book(isbn=isbn)
-        else:
-            logging.info(f"Updating existing book with ISBN: {isbn}")
-
-        # Update book details
-        book.title = data.get('title')
-        book.author = data.get('authors')
-        book.description = data.get('description', "No description available.")
-        book.published_date = data.get('publishedDate')
-        book.page_count = data.get('pageCount', 0)  # Default to 0 if not provided
-        book.thumbnail = data.get('thumbnail', None)
-        book.categories = data.get('categories', None)
-
-        db.session.add(book)
-        db.session.commit()
-        return book
-    except Exception as e:
-        logging.error(f"Failed to add/update book with ISBN: {isbn}. Error: {str(e)}")
-        raise
-
-
 def get_book_metadata(title, author, google_books_api_key):
     """Fetch metadata for a book using Google Books API."""
-    # First check if book exists in database by title and author
-    book = Book.query.filter(
-        Book.title.ilike(f"%{title}%"),
-        Book.author.ilike(f"%{author}%")  # Case-insensitive partial match
-    ).first()
-    if book:
-        # Return existing book metadata
-        return {
-            "title": book.title,
-            "authors": book.author,
-            "description": book.description,
-            "categories": book.categories,
-            "publishedDate": book.published_date,
-            "pageCount": book.page_count,
-            "thumbnail": book.thumbnail,
-            "isbn": book.isbn
-        }
 
     # If not found in DB, fetch from Google Books API
     api_key = google_books_api_key
@@ -140,7 +65,6 @@ def get_book_metadata(title, author, google_books_api_key):
                     "thumbnail": book.get("imageLinks", {}).get("thumbnail"),
                     "isbn": str(next((identifier.get("identifier") for identifier in book.get("industryIdentifiers", []) if identifier.get("type") == "ISBN_13"), ""))
                 }
-                add_or_update_book(metadata)
                 return metadata
         return {"error": "No book data found"}
     except Exception as e:
@@ -188,19 +112,6 @@ def generate_slug(title):
 app.jinja_env.filters['generate_slug'] = generate_slug
 
 
-from flask_login import LoginManager
-
-login_manager = LoginManager()
-login_manager.login_view = 'login'  # Redirect unauthorized users to the login page
-
-@login_manager.user_loader
-def load_user(user_id):
-    return db.session.get(User, int(user_id))  
-
-
-login_manager.init_app(app)
-
-
 def identify_books(text):
     response = client.chat.completions.create(
         model="gpt-4o-mini",
@@ -231,11 +142,10 @@ def index():
     all_book_metadata = []
     if request.method == "POST":
         user_input = request.form.get("preferences")
-        mbti = request.form.get("MBTI")
         obscurity_level = int(request.form.get("obscurity", 5))  # Get obscurity, default to 5
         if user_input:
             user_input = user_input[:500]  # Limit input to avoid large charges
-            user_profile = create_prompt(obscurity_level, user_input, mbti)
+            user_profile = create_prompt(obscurity_level, user_input)
 
             try:
 
@@ -261,15 +171,7 @@ def index():
             except Exception as e:
                 recommendations = f"Error: {e}"
 
-    popular_books = (
-    db.session.query(Book, func.count(UserBook.book_isbn).label('book_count'))
-    .join(UserBook, Book.isbn == UserBook.book_isbn)
-    .group_by(Book)
-    .order_by(func.count(UserBook.book_isbn).desc())
-    .limit(6)
-    .all())
-
-    return render_template("index.html", all_book_metadata=all_book_metadata, popular_books=popular_books)
+    return render_template("index.html", all_book_metadata=all_book_metadata)
 
 
 @app.route("/about")
@@ -320,31 +222,6 @@ def generate_reader_profile():
         traits = reader_profile.get("traits", [])
         suggested_books = reader_profile.get("suggested_books", [])
 
-         # Check if a profile already exists for the user
-        if current_user.is_authenticated:
-            existing_profile = ReaderProfile.query.filter_by(user_id=current_user.id).first()
-
-            if existing_profile:
-                # Update the existing profile
-                existing_profile.personality_type = personality_type
-                existing_profile.description = description
-                existing_profile.traits = traits
-                existing_profile.recommended_books = suggested_books
-                existing_profile.updated_at = datetime.utcnow()
-            else:
-                # Create a new profile
-                new_profile = ReaderProfile(
-                    user_id=current_user.id,
-                    personality_type=personality_type,
-                    description=description,
-                    traits=traits,
-                    recommended_books=suggested_books
-                )
-                db.session.add(new_profile)
-
-            db.session.commit()
-
-
         # Fetch metadata for each suggested book
         for book in suggested_books:
             try:
@@ -368,7 +245,6 @@ def generate_reader_profile():
             description=description,
             traits=traits,
             all_book_metadata=all_book_metadata,
-            user=current_user
         )
     except Exception as e:
         raise Exception(f"Error generating reader profile: {str(e)}")
@@ -407,90 +283,6 @@ def blog_post(post_title):
     if not post:
         abort(404)
     return render_template("blog_post.html", post=post)
-
-@app.route("/community")
-def community():
-    return render_template("community.html")
-
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        username = request.form['username']
-        email = request.form['email']
-        password = request.form['password']
-        
-        if User.query.filter_by(email=email).first():
-            return "Email already registered!"
-        
-        user = User(username=username, email=email)
-        user.set_password(password)
-        db.session.add(user)
-        db.session.commit()
-        return redirect(url_for('login'))
-
-    return render_template('register.html')
-
-from flask_login import login_user
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
-        user = User.query.filter_by(email=email).first()
-        
-        if user and user.check_password(password):
-            login_user(user, remember=True)
-            flash('Logged in successfully.')
-            return redirect(url_for('index'))
-        else:
-            return "Invalid credentials!"
-    
-    return render_template('login.html')
-
-from flask_login import logout_user
-
-@app.route('/logout')
-def logout():
-    logout_user()
-    return redirect(url_for('login'))
-
-@app.route('/my_account', methods=['GET'])
-@login_required
-def my_account():
-    # Fetch user books and stats
-    user_books = UserBook.query.filter_by(user_id=current_user.id).all()
-    read_books = [ub for ub in user_books if ub.status == 'finished']
-    want_to_read_books = [ub for ub in user_books if ub.status == 'want_to_read']
-    average_rating = sum(ub.rating for ub in read_books if ub.rating) / len(read_books) if read_books else 0
-
-    all_book_metadata = []
-
-    # Fetch reader profile
-    reader_profile = ReaderProfile.query.filter_by(user_id=current_user.id).first()
-
-    recommended_books = []
-
-    if reader_profile:
-        recommended_books = reader_profile.recommended_books
-
-        for book in recommended_books:
-            book_details = get_book_metadata(book["title"], book["author"], google_books_api_key)
-            book_details["amazon_link"] = get_amazon_search_link(book["title"], book["author"])
-            book_details["reason"] = book["reason"]
-            all_book_metadata.append(book_details)
-
-    return render_template(
-        'my_account.html',
-        user=current_user,
-        user_books=user_books,
-        read_books_count=len(read_books),
-        want_to_read_count=len(want_to_read_books),
-        average_rating=average_rating,
-        reader_profile=reader_profile,
-        all_book_metadata=all_book_metadata
-    )
-
 
 
 
@@ -535,79 +327,17 @@ def old_book_page(isbn):
     # Redirect with a 301 status code (permanent redirect)
     return redirect(new_url, 301)
 
-
-@app.route('/read_books')
-@login_required
-def read_books():
-    read_books = UserBook.query.filter_by(user_id=current_user.id, status='finished').all()
-    return render_template('read_books.html', books=read_books)
-
-@app.route('/want_to_read_books')
-@login_required
-def want_to_read_books():
-    want_to_read_books = UserBook.query.filter_by(user_id=current_user.id, status='want_to_read').all()
-    return render_template('want_to_read_books.html', books=want_to_read_books)
-
-
 @app.route('/under_construction')
 def under_construction():
     return render_template('under_construction.html')
 
-
-@app.route('/update_book_status/<string:isbn>', methods=['POST'])
-@login_required
-def update_book_status(isbn):
-
-    RATING_MAP = {
-        "Hated it": 1,
-        "Did not like it": 2,
-        "It was ok": 3,
-        "Liked it": 4,
-        "Loved it": 5
-    }
-    # Get the book
-    book = Book.query.get_or_404(isbn)
-
-    # Get the selected status from the form
-    status = request.form.get('status')
-    rating_text = request.form.get('rating')
-    rating = RATING_MAP.get(rating_text, None)  # Map rating text to integer, default to None
-
-
-    # Find or create the UserBook entry
-    user_book = UserBook.query.filter_by(user_id=current_user.id, book_isbn=isbn).first()
-    if not user_book:
-        user_book = UserBook(user_id=current_user.id, book_isbn=isbn)
-        db.session.add(user_book)
-
-    # Update the status
-    user_book.status = status
-    user_book.rating = rating
-    db.session.commit()
-
-    logging.warning(f"Updating book {book.title} to status: {status} with rating: {rating}")
-
-    flash(f'Status for "{book.title}" updated to "{status.replace("_", " ").title()}"!', 'success')
-    return redirect(url_for('index'))  # Redirect back to the book list
-
 @app.route('/search', methods=['GET', 'POST'])
 def search():
+    return render_template('404.html'), 404
 
-    title = request.form.get("title", None)
-    author = request.form.get("author", None)
-
-    all_book_metadata = []  # Initialize an empty results list
-
-    logging.warning(f"title: {title}, author: {author}")
-
-    if title and author:  
-
-        all_book_metadata = [get_book_metadata(title=title, author=author, google_books_api_key=google_books_api_key)]
-        logging.warning(all_book_metadata)
-
-    logging.warning(all_book_metadata)
-
-    return render_template('search.html', title=title, author=author, all_book_metadata=all_book_metadata)
+@app.route('/community', methods=['GET', 'POST'])
+def community():
+    return render_template('404.html'), 404
 
 # Directory to store uploaded files (temporary)
 UPLOAD_FOLDER = 'uploads'
@@ -621,156 +351,6 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-
-def add_book_to_user(title, author, status, isbn, rating):
-    logging.info(f"Adding book: {title}, {author}, {status}, {isbn}, {rating}")
-
-    user_book = UserBook.query.filter_by(user_id=current_user.id, book_isbn=isbn).first()
-    book = Book.query.get(str(isbn))
-
-    if not book:
-        # Add book to database
-        book_details = get_book_metadata(title=title, author=author, google_books_api_key=google_books_api_key)
-
-    if not user_book and book:  # We have book metadata but no user book
-        user_book = UserBook(user_id=current_user.id, book_isbn=isbn, status=status, rating=rating)
-        db.session.add(user_book)
-        db.session.commit()  # Save the book to the databas
-
-    logging.info(f"Adding book: {title}, {author}, {status}, {isbn}, {rating}")
-
-
-def map_goodreads_rating_to_text(goodreads_rating, custom_map=None):
-    # Default mapping
-    default_map = {
-        1: "Hated it",
-        2: "Didn't like it",
-        3: "It was OK",
-        4: "Liked it",
-        5: "Loved it"
-    }
-
-    # Use the custom map if provided
-    rating_map = custom_map or default_map
-
-    # Return the corresponding text
-    return rating_map.get(goodreads_rating, "No rating")
-
-
-@app.route('/upload_csv', methods=['POST'])
-def upload_csv():
-    logging.info("Processing CSV upload")
-    if 'goodreads_csv' not in request.files:
-        flash('No file part')
-        return redirect(url_for('my_account'))
-
-    file = request.files['goodreads_csv']
-
-    if file.filename == '':
-        flash('No selected file')
-        return redirect(url_for('my_account'))
-
-
-    if file and allowed_file(file.filename):
-        logging.info("File is valid")
-        filename = secure_filename(file.filename)
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(filepath)
-
-        # Process the CSV file
-        books_to_add = []
-        user_books_to_add = []
-        try:
-            with open(filepath, newline='', encoding='utf-8') as csvfile:
-                reader = csv.DictReader(csvfile)
-
-                for row in reader:
-                    logging.warning(f"Processing row: {row}")
-                    title = row.get('Title')
-                    author = row.get('Author')
-                    goodreads_status = row.get('Exclusive Shelf')
-                    status = 'read' if goodreads_status == 'read' else 'want_to_read' if goodreads_status == 'to-read' else None
-                    isbn = str(row.get('ISBN13').replace('=', '').replace('"', '').strip())
-                    rating = int(row.get('My Rating'))
-                    rating = map_goodreads_rating_to_text(goodreads_rating=rating)
-
-                    # Check if book exists in database
-                    book = Book.query.get(str(isbn))
-                    if not book:
-                        book_details = get_book_metadata(title=title, author=author, google_books_api_key=google_books_api_key)
-                        book = Book(
-                            isbn=isbn,
-                            title=book_details.get('title', title),
-                            author=book_details.get('authors', author),
-                            description=book_details.get('description', None),
-                            published_date=book_details.get('publishedDate', None),
-                            page_count=book_details.get('pageCount', 0),
-                            thumbnail=book_details.get('thumbnail', None),
-                            categories=book_details.get('categories', [])
-                        )
-                        books_to_add.append(book)
-
-                    user_book = UserBook.query.filter_by(user_id=current_user.id, book_isbn=isbn).first()
-                    if not user_book:
-                        user_books_to_add.append(UserBook(
-                            user_id=current_user.id,
-                            book_isbn=isbn,
-                            status=status,
-                            rating=rating
-                        ))
-
-                            # Batch insert
-                if books_to_add:
-                    db.session.bulk_save_objects(books_to_add)
-                    logging.info(f"Added {len(books_to_add)} new books to the database.")
-
-                if user_books_to_add:
-                    db.session.bulk_save_objects(user_books_to_add)
-                    logging.info(f"Added {len(user_books_to_add)} new user-book relationships.")
-
-                db.session.commit()
-                flash(f"Books successfully imported! {len(user_books_to_add)} books added to your library.", 'success')
-        except Exception as e:
-            db.session.rollback()
-            logging.error(f"Error processing CSV file: {str(e)}")
-            flash(f"Error processing CSV file: {str(e)}", 'error')
-        finally:
-            # Clean up the temporary file
-            if os.path.exists(filepath):
-                os.remove(filepath)
-            return redirect(url_for('my_account'))
-
-
-@app.route('/save-reader-profile', methods=['POST'])
-def save_reader_profile():
-    try:
-        data = request.get_json()
-        user_id = data['user_id']
-        personality_type = data['personality_type']
-        description = data['description']
-        traits = data['traits']
-        recommended_books = data['recommended_books']
-
-        # Save the profile to the database
-        profile = ReaderProfile(
-            user_id=user_id,
-            personality_type=personality_type,
-            description=description,
-            traits=traits,
-            recommended_books=recommended_books,
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow()
-        )
-        db.session.add(profile)
-        db.session.commit()
-
-        return jsonify({'message': 'Reader profile saved successfully!'}), 201
-    except SQLAlchemyError as e:
-        db.session.rollback()
-        return jsonify({'error': str(e)}), 500
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-    
 
 @app.route('/autocomplete', methods=['GET'])
 def autocomplete():

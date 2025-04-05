@@ -12,9 +12,8 @@ def set_obscurity(obscurity_level):
 
     return prompt_obscurity_modifier
 
-def create_prompt(obscurity_level, user_input, mbti):
+def create_prompt(obscurity_level, user_input):
     prompt = f"""
-    "MBTI": {mbti},
     "Obscurity_level": {obscurity_level},
     "Preferences: {user_input} 
     """

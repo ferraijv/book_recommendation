@@ -63,29 +63,6 @@ Find your next favorite book with SmartBookFinder. Get personalized recommendati
     {% include 'display_books_with_reason.html' %}
 </div>
 
-<div class="popular-books">
-    <h2>SmartBookFinder's Most Popular Books</h2>
-    <div class="popular-books-grid">
-        {% for book, count in popular_books %}
-        <div class="popular-book-card">
-            <a href="{{ url_for('book_page', title_slug=book.title|generate_slug, isbn=book.isbn) }}" class="popular-book-link">
-                <div class="popular-book-image">
-                    {% if book.thumbnail %}
-                    <img src="{{ book.thumbnail }}" alt="{{ book.title }}">
-                    {% else %}
-                    <div class="no-cover">No Cover Available</div>
-                    {% endif %}
-                </div>
-                <div class="popular-book-info">
-                    <h3>{{ book.title }}</h3>
-                    <p>By {{ book.author.replace("{", "").replace("}", "").replace("\"", "") }}</p>
-                    <p><strong>{{ count }} Users</strong> have read this book</p>
-                </div>
-            </a>
-        </div>
-        {% endfor %}
-    </div>
-</div>
 
 <script>
     const obscuritySlider = document.getElementById('obscurity');
@@ -122,6 +99,22 @@ Find your next favorite book with SmartBookFinder. Get personalized recommendati
     
     // Set initial random placeholder
     setRandomPlaceholder();
+
+    function toggleDescription(button) {
+    const descriptionContainer = button.parentElement;
+    const moreText = descriptionContainer.querySelector('.more-text');
+    const ellipsis = descriptionContainer.querySelector('.ellipsis');
+
+    if (moreText.style.display === 'none') {
+        moreText.style.display = 'inline';
+        ellipsis.style.display = 'none';
+        button.textContent = 'See Less';
+    } else {
+        moreText.style.display = 'none';
+        ellipsis.style.display = 'inline';
+        button.textContent = 'See More';
+    }
+}
     </script>
     <br><br>
 {% endblock %}

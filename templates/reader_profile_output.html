@@ -5,12 +5,6 @@
 {% block content %}
 
     <div class="reader-profile-content">
-        {% if not current_user.is_authenticated %}
-        <div class="login-notice">
-            <p>You must be logged in to save your Reader Personality profile and access personalized features.</p>
-            <a href="{{ url_for('login') }}" class="btn-primary">Log In</a>
-        </div>
-        {% endif %}
         <h2>Your Reader Personality</h2>
         <h3>{{ personality_type }}</h3>
         <p class="reader-profile-description">{{ description }}</p>
@@ -39,7 +33,7 @@
                 </div>
                 <div class="reader-profile-book-info">
                     <h4>{{ book.title }}</h4>
-                    <p class="author">by {{ book.authors }}</p>
+                    <p class="author">by {{ book.authors[0] }}</p>
                     <p class="reason">{{ book.reason }}</p>
                     <a href="{{ book.amazon_link }}" target="_blank" rel="noopener">View on Amazon</a>
                 </div>
