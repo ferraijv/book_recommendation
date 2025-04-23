@@ -21,7 +21,7 @@
                 {{ book.description[:200] }}
                     {% if book.description|length > 200 %}
                         <span class="ellipsis">...</span>
-                        <span class="more-text" style="display: none;"> {{ book.description }}</span>
+                        <span class="more-text" style="display: none;"> {{ book.description[200:] }}</span>
                         <a href="javascript:void(0);" class="see-more" onclick="toggleDescription(this)">See More</a>
                     {% endif %}
                 {% else %}
@@ -30,10 +30,10 @@
             </p>
             <p class="book-description">
                 {% if book.reason %}
-                <strong>Why this book was recommended:</strong> {{ book.reason }}
+                <strong>Why this book was recommended:</strong> {{ book.reason[:200] }}
                     {% if book.reason|length > 200 %}
                         <span class="ellipsis">...</span>
-                        <span class="more-text" style="display: none;"><strong>Why this book was recommended:</strong> {{ book.reason }}</span>
+                        <span class="more-text" style="display: none;">{{ book.reason[200:] }}</span>
                         <a href="javascript:void(0);" class="see-more" onclick="toggleDescription(this)">See More</a>
                     {% endif %}
                 {% else %}

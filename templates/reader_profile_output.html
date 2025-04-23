@@ -24,7 +24,9 @@
             <div class="reader-profile-book-card">
                 <div class="book-thumbnail">
                     {% if book.thumbnail %}
-                    <img src="{{ book.thumbnail }}" alt="{{ book.title }} cover" loading="lazy" onerror="this.src='/static/images/default-cover.jpg';">
+                    <a href="{{ book.amazon_link }}" target="_blank" data-ga-event="{{ book.ga_event }}">
+                        <img src="{{ book.thumbnail }}" alt="{{ book.title }} cover" loading="lazy" onerror="this.src='/static/images/default-cover.jpg';">
+                    </a>
                     {% else %}
                     <div class="no-thumbnail">
                         <span>No Image Available</span>

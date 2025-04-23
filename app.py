@@ -15,7 +15,7 @@ from flask_login import UserMixin, current_user, login_required
 from utils.db_utils import db, User, Book, UserBook, ReaderProfile
 from contextlib import contextmanager
 from utils.blog_utils import load_blog_posts
-from utils.prompt_utils import set_obscurity, create_prompt, get_book_recommendations, get_reader_profile_recommendations, get_reader_profile_suggestions
+from utils.gemini_utils import set_obscurity, create_prompt, get_book_recommendations, get_reader_profile_recommendations
 from utils.config_utils import get_secrets
 from utils.spotify_utils import get_audiobook_details, search_spotify_podcasts
 from sqlalchemy.sql.expression import func
@@ -25,6 +25,7 @@ from flask import request, jsonify, send_from_directory
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
 import re
+from google import genai
 
 
 from flask import Flask, render_template, request, abort
@@ -53,6 +54,7 @@ def get_book_metadata(title, author, google_books_api_key):
         if response.status_code == 200:
             logging.warning("Response is 200")
             data = response.json()
+            logging.warning(data)
             if 'items' in data:
                 book = data['items'][0]['volumeInfo']
                 metadata = {
@@ -80,6 +82,7 @@ def get_amazon_search_link(title, author):
 
 # Example usage (in your main app code):
 openai_api_key_raw = get_secrets("openai_api_key")
+gemini_api_key_raw = get_secrets("gemini_api_key")
 google_books_api_key_raw = get_secrets("google_books_api")
 postgres_url = get_secrets("postgres_url")['postgres_url']
 flask_secret_key = get_secrets("flask_secret_key")['flask_secret_key']
@@ -89,10 +92,14 @@ spotify_credentials = get_secrets("spotify_credentials")
 openai_api_key = openai_api_key_raw['api_key']
 google_books_api_key = google_books_api_key_raw['api_key']
 
+"""
 client = OpenAI(
     # defaults to os.environ.get("OPENAI_API_KEY")
     api_key=openai_api_key,
 )
+"""
+
+client = genai.Client(api_key=gemini_api_key_raw['gemini_api_key'])
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -110,27 +117,6 @@ def generate_slug(title):
     return re.sub(r'[^a-zA-Z0-9]+', '-', title.lower()).strip('-')
 
 app.jinja_env.filters['generate_slug'] = generate_slug
-
-
-def identify_books(text):
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": """
-            You are a helpful assistant providing book recommendations. For each recommendation, Provide the book recommendations in the following JSON format:
-            [
-              {"title": "<book title>", "author": "<author name>"},
-              {"title": "<book title>", "author": "<author name>"},
-              ...
-            ]"""},
-            {"role": "user", "content": f"Identify the books mentioned below and return results: {text}"}
-        ]
-    )
-    logging.warning(response)
-    response_content = response.choices[0].message.content
-    books = json.loads(response_content.strip("```json").strip())
-
-    return books
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -163,7 +149,7 @@ def index():
                     book_details = get_book_metadata(title, author, google_books_api_key)
                     book_details["amazon_link"] = get_amazon_search_link(title, author)
                     book_details["reason"] = reason
-                    if book_details.get("isbn"):
+                    if book_details.get("title"):
                         logging.warning(f"Adding book to all_book_metadata: {book_details}")
                         all_book_metadata.append(book_details)
 
@@ -189,11 +175,10 @@ def generate_reader_profile():
     # Get user input from the form
     genres = request.form.get("genres", "")[:500]
     favorite_books = request.form.get("favorite_books", "")[:500]
-    reading_frequency = request.form.get("reading_frequency", "")[:500]
-    format = request.form.get("format", "None Provided")[:500]
+    favorite_authors = request.form.get("favorite_authors", "")[:500]
     reading_goals = request.form.get("reading_goals", "")[:500]
     themes_to_avoid = request.form.get("themes_to_avoid", "")[:500]
-    mbti = request.form.get("mbti", "")
+    mbti = request.form.get("mbti", "")[:500]
 
     all_book_metadata = []
 
@@ -202,8 +187,7 @@ def generate_reader_profile():
         reader_profile_details = {
             "genres": genres,
             "favorite_books": favorite_books,
-            "reading_frequency": reading_frequency,
-            "format": format,
+            "favorite_authors": favorite_authors,
             "reading_goals": reading_goals,
             "themes_to_avoid": themes_to_avoid,
             "mbti": mbti
@@ -214,7 +198,7 @@ def generate_reader_profile():
         logging.warning(f"Raw API Response: {analysis}")
         
         # Parse the structured JSON response
-        reader_profile = json.loads(analysis)
+        reader_profile = analysis
         
         # Extract components for rendering
         personality_type = reader_profile.get("personality_type", "Unknown")
@@ -227,17 +211,17 @@ def generate_reader_profile():
             try:
                 title = book.get("title", "Unknown Title")
                 author = book.get("author", "Unknown Author")
-                reason = book.get("description", "No reason provided")
+                reason = book.get("reason", "No reason provided")
 
                 book_details = get_book_metadata(title, author, google_books_api_key)
                 book_details["amazon_link"] = get_amazon_search_link(title, author)
                 book_details["reason"] = reason
-                if book_details.get("isbn"):
+                if book_details.get("title"):
                     all_book_metadata.append(book_details)
             except Exception as e:
                 logging.error(f"Error fetching metadata for book '{title}': {str(e)}")
 
-        
+        logging.warning(f"All Metadata: {all_book_metadata}")
         # Render the template with the parsed data
         return render_template(
             "reader_profile_output.html",
