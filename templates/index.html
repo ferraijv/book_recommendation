@@ -3,118 +3,108 @@
 {% block title %}SmartBookFinder | Personalized Book Recommendations{% endblock %}
 
 {% block meta_description %}
-Find your next favorite book with SmartBookFinder. Get personalized recommendations based on genres, themes, and topics you love.
-{% endblock %}
-
-{% block meta_keywords %}
-<meta name="keywords" content="book recommendations, personalized book finder, favorite books, hidden gems, book search">
+Find your next favorite book with a refreshed, elegant experience that spotlights recommendations made for you.
 {% endblock %}
 
 {% block content %}
-<h1>Welcome to SmartBookFinder</h1>
-<p>Discover personalized book recommendations based on your interests, preferred genres, and favorite themes. Use the slider to explore popular books or hidden gems. Start your journey to finding your next favorite read today!</p>
-<div class="main-container">
-    <div class="search-container">
-        <form method="post" class="search-form">
-            <div class="form-group">
-                <label for="preferences">What are you looking for?</label>
-                <textarea 
-                    id="preferences" 
-                    name="preferences" 
-                    rows="4"
-                    placeholder="e.g., genre, themes, topic, or favorite books"
-                ></textarea>
+<section class="hero">
+    <div class="hero-grid">
+        <div class="hero-copy">
+            <div class="badges">
+                <span class="badge">New Look</span>
+                <span class="badge">Curated Reads</span>
+                <span class="badge">AI Assisted</span>
             </div>
+            <h1 class="hero-title">Discover a better way to explore books</h1>
+            <p class="hero-subtitle">Tell us what you love—genres, themes, even moods—and SmartBookFinder assembles a stack that feels handpicked for you.</p>
+            <ul class="hero-list">
+                <li><i class="fas fa-check-circle"></i> Balance between trending favorites and hidden gems.</li>
+                <li><i class="fas fa-check-circle"></i> Rich details, previews, and reasons each title made the list.</li>
+                <li><i class="fas fa-check-circle"></i> Build a reader profile to keep refining every recommendation.</li>
+            </ul>
+        </div>
 
-            <div class="obscurity-container">
-                <div class="obscurity-header">
-                    <label for="obscurity">Obscurity Level</label>
-                    <span class="obscurity-value" id="obscurity-value">5</span>
+        <div class="form-card">
+            <h2>Start with a quick prompt</h2>
+            <form method="post" class="search-form">
+                <div class="form-group">
+                    <label for="preferences">What should we find for you?</label>
+                    <textarea
+                        id="preferences"
+                        name="preferences"
+                        rows="4"
+                        placeholder="e.g., atmospheric mysteries with strong female leads"
+                    ></textarea>
                 </div>
-                
-                <input 
-                    type="range" 
-                    id="obscurity" 
-                    name="obscurity" 
-                    min="1" 
-                    max="10" 
-                    value="5"
-                    class="slider"
-                >
-                
-                <div class="slider-labels">
-                    <span>Popular</span>
-                    <span>Hidden Gems</span>
-                </div>
-                
-                <div class="tooltip">
-                    Adjust the slider to set how obscure you want your book recommendations to be. 
-                    Lower values favor popular books, while higher values favor rare finds.
-                </div>
-            </div>
 
-            <button type="submit" class="submit-button">
-                <span class="button-text">Find Books</span>
-                <div class="spinner" id="loadingSpinner"></div>
-            </button>
-        </form>
+                <div class="form-group">
+                    <div class="obscurity-row">
+                        <label for="obscurity">Obscurity level</label>
+                        <span class="obscurity-value" id="obscurity-value">5</span>
+                    </div>
+                    <input
+                        type="range"
+                        id="obscurity"
+                        name="obscurity"
+                        min="1"
+                        max="10"
+                        value="5"
+                        class="slider"
+                    >
+                    <div class="slider-labels">
+                        <span>Popular</span>
+                        <span>Hidden gems</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-button" id="submit-button">
+                    <span class="button-text">Find my books</span>
+                    <div class="spinner" id="loadingSpinner"></div>
+                </button>
+            </form>
+        </div>
     </div>
+</section>
 
+<section class="results">
+    <h2 class="section-title">Your recommendations</h2>
     {% include 'display_books_with_reason.html' %}
-</div>
-
+</section>
 
 <script>
     const obscuritySlider = document.getElementById('obscurity');
     const obscurityValue = document.getElementById('obscurity-value');
     const form = document.querySelector('form');
     const spinner = document.getElementById('loadingSpinner');
-    const buttonText = document.querySelector('.button-text');
-    
-    // Update obscurity value display
-    obscuritySlider.addEventListener('input', () => {
-        obscurityValue.textContent = obscuritySlider.value;
-    });
-    
-    // Random placeholder text functionality
-    const placeholderTexts = [
-        "e.g., science fiction novels about time travel",
-        "e.g., books similar to Pride and Prejudice",
-        "e.g., mysteries set in Victorian London",
-        "e.g., self-help books about productivity",
-        "e.g., books that make you feel like you're in a different world"
+    const button = document.getElementById('submit-button');
+
+    if (obscuritySlider && obscurityValue) {
+        obscuritySlider.addEventListener('input', () => {
+            obscurityValue.textContent = obscuritySlider.value;
+        });
+    }
+
+    const placeholders = [
+        "e.g., epic sci-fi with thoughtful world-building",
+        "e.g., feel-good romances in small towns",
+        "e.g., magical realism with lyrical prose",
+        "e.g., offbeat memoirs with humor",
+        "e.g., nonfiction about creative habits"
     ];
-    
+
     function setRandomPlaceholder() {
         const textarea = document.getElementById('preferences');
-        const randomIndex = Math.floor(Math.random() * placeholderTexts.length);
-        textarea.placeholder = placeholderTexts[randomIndex];
+        if (textarea) {
+            textarea.placeholder = placeholders[Math.floor(Math.random() * placeholders.length)];
+        }
     }
-    
-    // Handle form submission
-    form.addEventListener('submit', () => {
-        spinner.style.display = 'block';
-        buttonText.textContent = 'Finding Books...';
-    });
-    
-    // Set initial random placeholder
+
+    if (form && spinner && button) {
+        form.addEventListener('submit', () => {
+            button.classList.add('loading');
+        });
+    }
+
     setRandomPlaceholder();
-
-    function toggleDescription(button) {
-    const descriptionContainer = button.parentElement;
-    const moreText = descriptionContainer.querySelector('.more-text');
-    const ellipsis = descriptionContainer.querySelector('.ellipsis');
-
-    if (moreText.style.display === 'none') {
-        moreText.style.display = 'inline';
-        ellipsis.style.display = 'none';
-        button.textContent = 'See Less';
-    } else {
-        moreText.style.display = 'none';
-        ellipsis.style.display = 'inline';
-        button.textContent = 'See More';
-    }
-}
-    </script>
-    <br><br>
+</script>
 {% endblock %}
