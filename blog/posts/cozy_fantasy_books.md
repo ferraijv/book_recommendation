@@ -4,7 +4,7 @@ description: "A warm, image-rich shelf of low-stakes fantasy reads with found fa
 keywords: "cozy fantasy books, comforting fantasy, gentle magic, found family fantasy, cozy reads"
 author: "Jacob"
 date: "2025-11-22"
-img: "https://covers.openlibrary.org/b/isbn/9780316537008-L.jpg"
+img: "https://covers.openlibrary.org/b/isbn/9781250789259-L.jpg"
 ---
 
 <style>
@@ -100,11 +100,11 @@ img: "https://covers.openlibrary.org/b/isbn/9780316537008-L.jpg"
 </style>
 
 <div class="hero-card">
-  <img src="https://covers.openlibrary.org/b/isbn/9781250886088-L.jpg" alt="Hardcover of Legends &amp; Lattes" loading="lazy" onerror="this.onerror=null;this.src='/static/images/cover-placeholder.svg';" />
+  <img src="https://covers.openlibrary.org/b/isbn/9781250789259-L.jpg" alt="Hardcover of Legends &amp; Lattes" loading="lazy" onerror="this.onerror=null;this.src='/static/images/cover-placeholder.svg';" />
   <div class="hero-text">
     <div class="section-label">Cozy Fantasy Shelf</div>
     <h1>Fireside Picks for Gentle Magic</h1>
-    <p>Books with soft stakes, warm drinks, and friendships worth rooting for. Every cover below should load cleanly—no more broken image boxes.</p>
+    <p>Books with soft stakes, warm drinks, and friendships worth rooting for.</p>
     <div class="pill-row">
       <span class="pill">Found Family</span>
       <span class="pill">Tea &amp; Treats</span>
