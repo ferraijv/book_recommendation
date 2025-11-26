@@ -4,7 +4,7 @@ description: "A warm, image-rich shelf of low-stakes fantasy reads with found fa
 keywords: "cozy fantasy books, comforting fantasy, gentle magic, found family fantasy, cozy reads"
 author: "Jacob"
 date: "2025-11-22"
-img: "https://covers.openlibrary.org/b/isbn/9781250789259-L.jpg"
+img: "https://m.media-amazon.com/images/I/81YlRnQ13YL._SL1500_.jpg"
 ---
 
 <style>
