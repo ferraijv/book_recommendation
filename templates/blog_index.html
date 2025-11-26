@@ -3,28 +3,45 @@
 {% block title %}Home - My Blog{% endblock %}
 
 {% block content %}
-    <h1>Blog</h1>
-    <div class="featured-post">
-        <a href="/blog/best-books-to-understand-the-tiktok-ban">
-        <h2>Featured Post</h2>
-        </a>
-            <a href="/blog/best-books-to-understand-the-tiktok-ban">
-                <img src="https://m.media-amazon.com/images/I/41XJUXNBuhL._SY445_SX342_PQ1_.jpg" alt="Best Books to Understand the TikTok Ban" style="max-width:30%; height:auto;">
-                <h3>Best Books to Understand the TikTok Ban</h3>
-            </a>
+<section class="blog-page">
+    <div class="blog-page-header">
+        <h1>Blog</h1>
+        <p class="blog-page-subtitle">Curated reading lists, author spotlights, and guides to help you find your next great book.</p>
     </div>
-    <h2>All blog posts</h2>
-    <div class="blog-list">
-    <ul>
-        {% for post in posts %}
-            <div class="blog-post">
 
-            <a href="/blog/{{ post.metadata.title.replace(' ', '-').lower() }}">
-                <img src={{post.metadata['img']}} alt="Top 5 Books About Dreams" style="max-width:30%; height:auto;">
-                <h3>{{ post.metadata['title'] }}</h3>
-            </a>
+    <div class="featured-post-card">
+        <a class="featured-post-link" href="/blog/best-books-to-understand-the-tiktok-ban">
+            <div class="featured-media">
+                <img src="https://m.media-amazon.com/images/I/41XJUXNBuhL._SY445_SX342_PQ1_.jpg" alt="Best Books to Understand the TikTok Ban">
             </div>
+            <div class="featured-copy">
+                <p class="blog-meta">Featured</p>
+                <h2>Best Books to Understand the TikTok Ban</h2>
+                <p class="blog-excerpt">Explore the policy, business, and culture angles behind the TikTok ban with these essential reads.</p>
+            </div>
+        </a>
+    </div>
+
+    <div class="blog-list-header">
+        <h2>All blog posts</h2>
+        <p class="blog-page-subtitle">Browse the full archive of reading recommendations and thematic collections.</p>
+    </div>
+
+    <div class="blog-grid">
+        {% for post in posts %}
+        <article class="blog-card">
+            <a class="blog-card-link" href="/blog/{{ post.metadata.title.replace(' ', '-').lower() }}">
+                <div class="blog-thumb">
+                    <img src="{{ post.metadata['img'] }}" alt="{{ post.metadata['title'] }}">
+                </div>
+                <div class="blog-card-body">
+                    <p class="blog-meta">{{ post.metadata['date'] }}</p>
+                    <h3>{{ post.metadata['title'] }}</h3>
+                    <p class="blog-excerpt">{{ post.metadata['description'] }}</p>
+                </div>
+            </a>
+        </article>
         {% endfor %}
-    </ul>
-        </div>
+    </div>
+</section>
 {% endblock %}
