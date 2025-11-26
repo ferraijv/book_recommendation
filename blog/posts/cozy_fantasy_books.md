@@ -4,7 +4,7 @@ description: "A warm, image-rich shelf of low-stakes fantasy reads with found fa
 keywords: "cozy fantasy books, comforting fantasy, gentle magic, found family fantasy, cozy reads"
 author: "Jacob"
 date: "2025-11-22"
-img: /static/images/cover-placeholder.svg
+img: "https://covers.openlibrary.org/b/isbn/9780316537008-L.jpg"
 ---
 
 <style>
@@ -113,11 +113,6 @@ img: /static/images/cover-placeholder.svg
     </div>
   </div>
 </div>
-
-### Quick Glow-Up
-- Fresh layout with tidy cards, inline image fallbacks, and cozy accent colors.
-- All cover images point to stable Open Library URLs with a local placeholder if they fail to load.
-- Mix of single novels and series starters so you can binge or sip at your own pace.
 
 ## Hearth &amp; Home Stories
 <div class="shelf-grid">
