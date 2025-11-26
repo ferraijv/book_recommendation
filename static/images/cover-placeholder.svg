@@ -8,8 +8,8 @@
   <rect width="480" height="720" fill="url(#bg)" rx="20" />
   <rect x="46" y="54" width="388" height="612" fill="none" stroke="#94a3b8" stroke-width="4" stroke-dasharray="14 12" rx="14" />
   <g fill="#475569" font-family="'Inter','Arial',sans-serif" text-anchor="middle">
-    <text x="240" y="330" font-size="32" font-weight="700">Cover unavailable</text>
-    <text x="240" y="372" font-size="22" opacity="0.9">Click to open details</text>
+    <text x="240" y="322" font-size="32" font-weight="700">Image not available</text>
+    <text x="240" y="364" font-size="22" opacity="0.9">Cover placeholder — tap for details</text>
   </g>
   <g fill="none" stroke="#475569" stroke-width="3" transform="translate(180 160)">
     <rect x="0" y="0" width="120" height="160" rx="10" />
