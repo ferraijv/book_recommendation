@@ -196,9 +196,15 @@ def generate_reader_profile():
         # Call the ChatGPT API with the input data
         analysis = get_reader_profile_recommendations(reader_profile_details, client)
         logging.warning(f"Raw API Response: {analysis}")
-        
+
         # Parse the structured JSON response
         reader_profile = analysis
+        if isinstance(reader_profile, str):
+            try:
+                reader_profile = json.loads(reader_profile)
+            except Exception:
+                logging.error("Reader profile response was a string but could not be parsed as JSON.")
+                reader_profile = {}
         
         # Extract components for rendering
         personality_type = reader_profile.get("personality_type", "Unknown")
