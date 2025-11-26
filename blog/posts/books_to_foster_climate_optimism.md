@@ -20,6 +20,13 @@ img: https://covers.openlibrary.org/b/isbn/9780525658351-L.jpg
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
   color: #0f172a;
 }
+.book-card img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  background: #e2e8f0;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+}
 .book-card h4 {
   margin: 0.5rem 0 0.25rem;
   font-size: 1.05rem;
@@ -38,10 +45,14 @@ img: https://covers.openlibrary.org/b/isbn/9780525658351-L.jpg
 }
 .callout {
   padding: 1rem 1.25rem;
-  border-left: 4px solid #10b981;
-  background: #ecfdf3;
+  border-left: 4px solid #0f9a67;
+  background: #d1fae5;
   border-radius: 10px;
   margin: 1rem 0 1.5rem;
+  color: #064e3b;
+}
+.callout strong {
+  color: #065f46;
 }
 </style>
 
@@ -53,7 +64,7 @@ Feeling overwhelmed by climate headlines? These seven books balance urgency with
 
 <div class="book-grid">
   <div class="book-card">
-    <img src="https://covers.openlibrary.org/b/isbn/9780525658351-L.jpg" alt="Cover of The Future We Choose" loading="lazy" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;480&quot; height=&quot;720&quot;><rect width=&quot;100%&quot; height=&quot;100%&quot; fill=&quot;%23f1f5f9&quot;/><text x=&quot;50%&quot; y=&quot;50%&quot; dominant-baseline=&quot;middle&quot; text-anchor=&quot;middle&quot; fill=&quot;%23475a6b&quot; font-family=&quot;Arial, sans-serif&quot; font-size=&quot;32&quot;>Cover unavailable</text></svg>';"></img>
+    <img src="https://covers.openlibrary.org/b/isbn/9780525658351-L.jpg" alt="Cover of The Future We Choose" loading="lazy" onerror="this.onerror=null;this.src='/static/images/cover-placeholder.svg';"></img>
     <h4>1. <em>The Future We Choose</em></h4>
     <div class="meta">Christiana Figueres and Tom Rivett-Carnac</div>
     <ul>
@@ -64,7 +75,7 @@ Feeling overwhelmed by climate headlines? These seven books balance urgency with
   </div>
 
   <div class="book-card">
-    <img src="https://covers.openlibrary.org/b/isbn/9781642598974-L.jpg" alt="Cover of Not Too Late" loading="lazy" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;480&quot; height=&quot;720&quot;><rect width=&quot;100%&quot; height=&quot;100%&quot; fill=&quot;%23f1f5f9&quot;/><text x=&quot;50%&quot; y=&quot;50%&quot; dominant-baseline=&quot;middle&quot; text-anchor=&quot;middle&quot; fill=&quot;%23475a6b&quot; font-family=&quot;Arial, sans-serif&quot; font-size=&quot;32&quot;>Cover unavailable</text></svg>';"></img>
+    <img src="https://covers.openlibrary.org/b/isbn/9781642598974-L.jpg" alt="Cover of Not Too Late" loading="lazy" onerror="this.onerror=null;this.src='/static/images/cover-placeholder.svg';"></img>
     <h4>2. <em>Not Too Late: Changing the Climate Story from Despair to Possibility</em></h4>
     <div class="meta">Edited by Rebecca Solnit and Thelma Young Lutunatabua</div>
     <ul>
@@ -75,7 +86,7 @@ Feeling overwhelmed by climate headlines? These seven books balance urgency with
   </div>
 
   <div class="book-card">
-    <img src="https://covers.openlibrary.org/b/isbn/9780593420469-L.jpg" alt="Cover of Speed &amp; Scale" loading="lazy" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;480&quot; height=&quot;720&quot;><rect width=&quot;100%&quot; height=&quot;100%&quot; fill=&quot;%23f1f5f9&quot;/><text x=&quot;50%&quot; y=&quot;50%&quot; dominant-baseline=&quot;middle&quot; text-anchor=&quot;middle&quot; fill=&quot;%23475a6b&quot; font-family=&quot;Arial, sans-serif&quot; font-size=&quot;32&quot;>Cover unavailable</text></svg>';"></img>
+    <img src="https://covers.openlibrary.org/b/isbn/9780593420469-L.jpg" alt="Cover of Speed &amp; Scale" loading="lazy" onerror="this.onerror=null;this.src='/static/images/cover-placeholder.svg';"></img>
     <h4>3. <em>Speed &amp; Scale</em></h4>
     <div class="meta">John Doerr</div>
     <ul>
@@ -86,7 +97,7 @@ Feeling overwhelmed by climate headlines? These seven books balance urgency with
   </div>
 
   <div class="book-card">
-    <img src="https://covers.openlibrary.org/b/isbn/9780593237081-L.jpg" alt="Cover of All We Can Save" loading="lazy" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;480&quot; height=&quot;720&quot;><rect width=&quot;100%&quot; height=&quot;100%&quot; fill=&quot;%23f1f5f9&quot;/><text x=&quot;50%&quot; y=&quot;50%&quot; dominant-baseline=&quot;middle&quot; text-anchor=&quot;middle&quot; fill=&quot;%23475a6b&quot; font-family=&quot;Arial, sans-serif&quot; font-size=&quot;32&quot;>Cover unavailable</text></svg>';"></img>
+    <img src="https://covers.openlibrary.org/b/isbn/9780593237081-L.jpg" alt="Cover of All We Can Save" loading="lazy" onerror="this.onerror=null;this.src='/static/images/cover-placeholder.svg';"></img>
     <h4>4. <em>All We Can Save</em></h4>
     <div class="meta">Edited by Ayana Elizabeth Johnson and Katharine K. Wilkinson</div>
     <ul>
@@ -97,7 +108,7 @@ Feeling overwhelmed by climate headlines? These seven books balance urgency with
   </div>
 
   <div class="book-card">
-    <img src="https://covers.openlibrary.org/b/isbn/9780143130444-L.jpg" alt="Cover of Drawdown" loading="lazy" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;480&quot; height=&quot;720&quot;><rect width=&quot;100%&quot; height=&quot;100%&quot; fill=&quot;%23f1f5f9&quot;/><text x=&quot;50%&quot; y=&quot;50%&quot; dominant-baseline=&quot;middle&quot; text-anchor=&quot;middle&quot; fill=&quot;%23475a6b&quot; font-family=&quot;Arial, sans-serif&quot; font-size=&quot;32&quot;>Cover unavailable</text></svg>';"></img>
+    <img src="https://covers.openlibrary.org/b/isbn/9780143130444-L.jpg" alt="Cover of Drawdown" loading="lazy" onerror="this.onerror=null;this.src='/static/images/cover-placeholder.svg';"></img>
     <h4>5. <em>Drawdown</em></h4>
     <div class="meta">Edited by Paul Hawken</div>
     <ul>
@@ -108,7 +119,7 @@ Feeling overwhelmed by climate headlines? These seven books balance urgency with
   </div>
 
   <div class="book-card">
-    <img src="https://covers.openlibrary.org/b/isbn/9780316300131-L.jpg" alt="Cover of The Ministry for the Future" loading="lazy" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;480&quot; height=&quot;720&quot;><rect width=&quot;100%&quot; height=&quot;100%&quot; fill=&quot;%23f1f5f9&quot;/><text x=&quot;50%&quot; y=&quot;50%&quot; dominant-baseline=&quot;middle&quot; text-anchor=&quot;middle&quot; fill=&quot;%23475a6b&quot; font-family=&quot;Arial, sans-serif&quot; font-size=&quot;32&quot;>Cover unavailable</text></svg>';"></img>
+    <img src="https://covers.openlibrary.org/b/isbn/9780316300131-L.jpg" alt="Cover of The Ministry for the Future" loading="lazy" onerror="this.onerror=null;this.src='/static/images/cover-placeholder.svg';"></img>
     <h4>6. <em>The Ministry for the Future</em></h4>
     <div class="meta">Kim Stanley Robinson</div>
     <ul>
@@ -119,7 +130,7 @@ Feeling overwhelmed by climate headlines? These seven books balance urgency with
   </div>
 
   <div class="book-card">
-    <img src="https://covers.openlibrary.org/b/isbn/9780593136292-L.jpg" alt="Cover of Under a White Sky" loading="lazy" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;480&quot; height=&quot;720&quot;><rect width=&quot;100%&quot; height=&quot;100%&quot; fill=&quot;%23f1f5f9&quot;/><text x=&quot;50%&quot; y=&quot;50%&quot; dominant-baseline=&quot;middle&quot; text-anchor=&quot;middle&quot; fill=&quot;%23475a6b&quot; font-family=&quot;Arial, sans-serif&quot; font-size=&quot;32&quot;>Cover unavailable</text></svg>';"></img>
+    <img src="https://covers.openlibrary.org/b/isbn/9780593136292-L.jpg" alt="Cover of Under a White Sky" loading="lazy" onerror="this.onerror=null;this.src='/static/images/cover-placeholder.svg';"></img>
     <h4>7. <em>Under a White Sky</em></h4>
     <div class="meta">Elizabeth Kolbert</div>
     <ul>
