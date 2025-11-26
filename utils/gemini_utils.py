@@ -40,7 +40,7 @@ Return exactly 5 book recommendations in the following valid JSON format:
 """
 
     response = client.models.generate_content(
-        model="gemini-2.0-flash",
+        model="gemini-2.5-flash",
         contents=[prompt],
         config=GenerateContentConfig(
             temperature=0.7
@@ -90,7 +90,7 @@ def get_reader_profile_recommendations(reader_profile_details, client):
     prompt = create_reader_profile_prompt(reader_profile_details)
 
     response = client.models.generate_content(
-        model="gemini-2.0-flash",
+        model="gemini-2.5-flash",
         contents=[prompt],
         config=GenerateContentConfig(
             temperature=0.7,
