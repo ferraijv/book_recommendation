@@ -12,323 +12,91 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <title>{% block title %}My Blog{% endblock %}</title>
-    
-    <meta name="description" content="{% block meta_description %}Default description for SmartBookFinder.{% endblock %}">
 
-    <!-- Open Graph Metadata -->
-    <meta property="og:title" content="{% block og_title %}Default OG Title{% endblock %}">
-    <meta property="og:description" content="{% block og_description %}Personalized book recommendations{% endblock %}">
+    <title>{% block title %}SmartBookFinder{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}Discover curated book recommendations tailored to your taste.{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}SmartBookFinder{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Personalized book recommendations for every reader.{% endblock %}">
     <meta property="og:image" content="{% block og_image %}/static/images/default-image.png{% endblock %}">
     <meta property="og:url" content="{% block og_url %}https://smartbookfinder.com{% endblock %}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="/static/styles.css">
     <link rel="canonical" href="https://smartbookfinder.com{{ request.path }}" />
     <link rel="icon" type="image/webp" href="{{ url_for('static', filename='images/flavicon.webp') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-
 </head>
 <body>
-    <!-- Shared Navigation -->
-    <div class="navbar">
-        <a href="/" class="navbar-brand">
-            <img src="/static/images/book_logo.webp" alt="Logo" class="navbar-logo">
-        </a>
+<div class="site-shell">
+    <header>
+        <div class="container navbar">
+            <a href="/" class="brand" aria-label="SmartBookFinder home">
+                <img src="/static/images/book_logo.webp" alt="SmartBookFinder logo">
+                <span>SmartBookFinder</span>
+            </a>
 
-    
-        <!-- Hamburger Menu -->
-        <button class="hamburger-menu" id="hamburger-menu" aria-label="Toggle navigation">
-            ☰
-        </button>
-    
-        <!-- Navigation Links -->
-        <div class="navbar-links" id="navbar-links">
-            <a href="/">Home</a>
-            <a href="/reader-profile">Reader Profile</a>
-            <a href="/about">About</a>
-            <a href="/blog">Blog</a>
-        </div>
-    </div>
-    
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        <div class="container mt-4">
-            {% for category, message in messages %}
-            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <nav class="nav-links" id="nav-links">
+                <a href="/">Home</a>
+                <a href="/reader-profile">Reader Profile</a>
+                <a href="/about">About</a>
+                <a href="/blog">Blog</a>
+            </nav>
+
+            <div class="nav-actions">
+                <a class="nav-cta" href="/reader-profile">Start a profile</a>
             </div>
-            {% endfor %}
+
+            <button class="hamburger" id="hamburger" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+            </button>
         </div>
-        {% endif %}
-    {% endwith %}
-    <script>
-    function toggleNavbar() {
-        const navbarLinks = document.querySelector('.navbar-links');
-        navbarLinks.classList.toggle('hidden');
-    }
-    </script>
+    </header>
 
+    <main class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
-    <!-- Main Content Block -->
-    <div class="container">
-        {% block content %}
-        {% endblock %}
-    </div>
-    <br><br><br><br>
-    <div class="hero-banner">
-    <div class="hero-content">
-        <h1>Discover Your Next Great Read</h1>
-        <p>Find personalized book recommendations tailored to your preferences.</p>
-        <a href="/reader-profile" class="cta-button">Get Started</a>
-    </div>
-    </div>
+        {% block content %}{% endblock %}
+    </main>
 
-    <!-- Toggle Description Script -->
-    <script>
-       // Improved navbar functionality
-document.addEventListener('DOMContentLoaded', () => {
-    const hamburger = document.getElementById('hamburger-menu');
-    const navLinks = document.getElementById('navbar-links');
-    const searchInput = document.getElementById('navbar-search');
-    const resultsDiv = document.getElementById('navbar-autocomplete-results');
-    
-    // Toggle menu visibility
-    hamburger.addEventListener('click', () => {
-        navLinks.classList.toggle('show');
-        const icon = hamburger.querySelector('.hamburger-icon');
-        icon.textContent = navLinks.classList.contains('show') ? '✕' : '☰'; // Change icon
-    });
-
-    // Close menu when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!navLinks.contains(e.target) && !hamburger.contains(e.target)) {
-            navLinks.classList.remove('show');
-            const icon = hamburger.querySelector('.hamburger-icon');
-            icon.textContent = '☰'; // Reset icon
-        }
-    });
-
-    // Search functionality with debouncing
-    let searchTimeout;
-    searchInput.addEventListener('input', () => {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(async () => {
-            const query = searchInput.value.trim();
-            
-            if (query.length > 2) {
-                try {
-                    const response = await fetch(`/autocomplete?query=${encodeURIComponent(query)}`);
-                    const results = await response.json();
-                    
-                    resultsDiv.innerHTML = '';
-                    results.forEach(item => {
-                        const result = document.createElement('div');
-                        result.className = 'navbar-autocomplete-item';
-                        result.innerHTML = `<a href="/book/${item.isbn}">${item.title} by ${item.author}</a>`;
-                        resultsDiv.appendChild(result);
-                    });
-                    
-                    resultsDiv.classList.add('show');
-                } catch (error) {
-                    console.error('Error fetching results:', error);
-                }
-            } else {
-                resultsDiv.classList.remove('show');
-            }
-        }, 300);
-    });
-
-    // Close search results when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) {
-            resultsDiv.classList.remove('show');
-        }
-    });
-});
-        </script>
-        
-
-    <!-- Shared Footer -->
     <footer>
-        <p style="font-size: 0.9em; color: gray; text-align: center; margin-top: 20px;">
-            Disclaimer: As an Amazon Associate, I earn from qualifying purchases. The recommendations on this site are generated dynamically and are not influenced by affiliate income.
-        </p>
+        <div class="container footer-grid">
+            <p>SmartBookFinder surfaces thoughtful recommendations powered by your preferences.</p>
+            <p style="font-size: 0.9em;">Disclaimer: As an Amazon Associate, I earn from qualifying purchases. Recommendations are generated dynamically and are not influenced by affiliate income.</p>
+        </div>
     </footer>
+</div>
+
+<script>
+    const hamburger = document.getElementById('hamburger');
+    const navLinks = document.getElementById('nav-links');
+
+    if (hamburger) {
+        hamburger.addEventListener('click', () => {
+            navLinks.classList.toggle('open');
+        });
+    }
+
+    function toggleDescription(button) {
+        const descriptionContainer = button.parentElement;
+        const moreText = descriptionContainer.querySelector('.more-text');
+        const ellipsis = descriptionContainer.querySelector('.ellipsis');
+
+        if (moreText && ellipsis) {
+            const isHidden = moreText.style.display === 'none' || moreText.style.display === '';
+            moreText.style.display = isHidden ? 'inline' : 'none';
+            ellipsis.style.display = isHidden ? 'none' : 'inline';
+            button.textContent = isHidden ? 'See Less' : 'See More';
+        }
+    }
+</script>
 </body>
 </html>
-<style>
-.navbar {
-    background-color: #007bff;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem 1rem; /* Adjust padding for mobile */
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    width: 100%; /* Ensure it spans the full width */
-    box-sizing: border-box; /* Include padding in width calculation */
-}
-
-/* Logo styling */
-.navbar-logo {
-    height: 40px;
-    transition: transform 0.2s ease;
-}
-
-.navbar-logo:hover {
-    transform: scale(1.05);
-}
-
-/* Search bar improvements */
-.navbar-search {
-    position: relative;
-    max-width: 500px;
-    width: 100%;
-    margin: 0 auto;
-}
-
-#navbar-search {
-    width: 100%;
-    padding: 0.75rem 1rem 0.75rem 2.5rem;
-    border: none;
-    border-radius: 24px;
-    background-color: rgba(255, 255, 255, 0.9);
-    font-size: 1rem;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-#navbar-search:focus {
-    background-color: white;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    outline: none;
-}
-
-/* Search icon */
-.navbar-search::before {
-    content: '🔍';
-    position: absolute;
-    left: 1rem;
-    top: 40%;
-    transform: translateY(-50%);
-    color: #666;
-    font-size: 1rem;
-    z-index: 1050;
-}
-
-/* Autocomplete results styling */
-#navbar-autocomplete-results {
-    position: absolute;
-    top: calc(100% + 0.5rem);
-    left: 0;
-    right: 0;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    max-height: 300px;
-    overflow-y: auto;
-    opacity: 0;
-    transform: translateY(-10px);
-    visibility: hidden;
-    transition: all 0.2s ease;
-}
-
-#navbar-autocomplete-results.show {
-    opacity: 1;
-    transform: translateY(0);
-    visibility: visible;
-}
-
-.navbar-autocomplete-item {
-    padding: 0.75rem 1rem;
-    transition: background-color 0.2s ease;
-}
-
-.navbar-autocomplete-item:hover {
-    background-color: #f8f9fa;
-}
-
-.navbar-autocomplete-item a {
-    color: #333;
-    text-decoration: none;
-    display: block;
-}
-
-.navbar-links {
-    display: none; /* Show by default on larger screens */
-    gap: 1.5rem;
-    align-items: center;
-}
-
-/* When the 'show' class is added, show the links */
-.navbar-links.show {
-    display: flex; /* Make links visible */
-}
-
-
-.navbar-links.hidden {
-    display: none;
-}
-
-.navbar-links a {
-    color: white;
-    text-decoration: none;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    transition: all 0.2s ease;
-    font-weight: 500;
-}
-
-.navbar-links a:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-}
-
-/* Hamburger menu */
-.hamburger-menu {
-    display: block;
-    background: none;
-    border: none;
-    color: white;
-    font-size: 1.5rem;
-    cursor: pointer;
-    padding: 0.5rem;
-    transition: transform 0.2s ease;
-}
-
-/* Mobile styles */
-@media (max-width: 768px) {
-    .navbar {
-        width: 100%;
-    }
-
-    .hamburger-menu {
-        display: block;
-    }
-
-    .navbar-links {
-        position: fixed;
-        top: 73px; /* Adjust based on your navbar height */
-        left: 0;
-        right: 0;
-        background-color: #007bff;
-        flex-direction: column;
-        padding: 1rem;
-        gap: 0.5rem;
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
-    }
-
-    .navbar-links.show {
-        transform: translateX(0);
-    }
-
-    .navbar-search {
-        max-width: none;
-        margin: 0 1rem;
-    }
-}
-</style>

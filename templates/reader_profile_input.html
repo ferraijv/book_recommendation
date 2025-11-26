@@ -3,56 +3,103 @@
 {% block title %}SmartBookFinder - Reader Profile Input{% endblock %}
 
 {% block content %}
-<h1 class="form-title">Create Your Reader Profile</h1>
-<div class="spinner" id="loadingSpinner"></div>
-<div class="reader-profile-form">
-    <form method="POST" action="/generate-reader-profile">
+<section class="reader-profile-input container">
+    <div class="reader-profile-layout">
+        <div class="reader-profile-intro-card">
+            <div class="badges">
+                <span class="badge">Reader DNA</span>
+                <span class="badge">Guided prompts</span>
+            </div>
+            <h1 class="hero-title">Shape the profile behind your picks</h1>
+            <p class="hero-subtitle">Tell us what lights you up (and what doesn’t) so we can craft recommendations that feel tailor-made.</p>
+            <ul class="hero-list">
+                <li><i class="fas fa-check-circle"></i> Lead with a few favorite books or authors—we’ll echo their tone and pacing.</li>
+                <li><i class="fas fa-check-circle"></i> Call out genres or vibes to skip to avoid misses.</li>
+                <li><i class="fas fa-check-circle"></i> Share a reading goal so we can balance comfort picks with discovery.</li>
+            </ul>
+            <div class="prompt-ideas">
+                <p class="input-hint">Need inspiration? Try one of these angles:</p>
+                <div class="prompt-chips">
+                    <span class="chip">Cozy mysteries with witty banter</span>
+                    <span class="chip">Lyrical sci-fi that leans hopeful</span>
+                    <span class="chip">Rom-coms without love triangles</span>
+                </div>
+            </div>
+        </div>
 
-        <!-- Section 1: Favorites -->
-        <fieldset>
-            <legend>Favorites</legend>
-            <label for="favorite-books">Favorite Books</label>
-            <textarea id="favorite-books" name="favorite_books" rows="3" placeholder="E.g., Pride and Prejudice, Dune"></textarea>
+        <div class="form-card reader-profile-form-card">
+            <div class="form-header">
+                <p class="eyebrow">Reader Profile</p>
+                <h2>Dial in your preferences</h2>
+                <p class="input-hint">Specific notes help us translate your taste into a profile you’ll want to revisit.</p>
+            </div>
+            <form method="POST" action="/generate-reader-profile" class="reader-profile-form-body">
+                <fieldset class="reader-profile-fieldset">
+                    <legend>Favorites</legend>
+                    <div class="input-block">
+                        <label for="favorite-books">Favorite books</label>
+                        <p class="input-hint">List a few titles you adore—comma separated is perfect.</p>
+                        <textarea id="favorite-books" class="input-control" name="favorite_books" rows="3" placeholder="E.g., The Night Circus, Project Hail Mary"></textarea>
+                    </div>
+                    <div class="input-block">
+                        <label for="favorite-authors">Favorite authors</label>
+                        <p class="input-hint">Authors whose voice or pacing resonate with you.</p>
+                        <textarea id="favorite-authors" class="input-control" name="favorite_authors" rows="3" placeholder="E.g., Becky Chambers, Tana French"></textarea>
+                    </div>
+                    <div class="input-block">
+                        <label for="genres">Favorite genres</label>
+                        <p class="input-hint">Genres, moods, or tropes you gravitate toward.</p>
+                        <textarea id="genres" class="input-control" name="genres" rows="2" placeholder="E.g., mystery, sci-fi with humor, cozy fantasy"></textarea>
+                    </div>
+                </fieldset>
 
-            <label for="favorite-authors">Favorite Authors</label>
-            <textarea id="favorite-authors" name="favorite_authors" rows="3" placeholder="E.g., Jane Austen, Frank Herbert"></textarea>
+                <div class="dual-stack">
+                    <fieldset class="reader-profile-fieldset">
+                        <legend>Preferences</legend>
+                        <div class="input-block">
+                            <label for="themes-to-avoid">Genres or themes to avoid</label>
+                            <p class="input-hint">Anything that pulls you out of the story.</p>
+                            <textarea id="themes-to-avoid" class="input-control" name="themes_to_avoid" rows="2" placeholder="E.g., horror, grimdark, love triangles"></textarea>
+                        </div>
+                    </fieldset>
 
-            <label for="genres">Favorite Genres</label>
-            <textarea id="genres" name="genres" rows="3" placeholder="E.g., mystery, sci-fi, romance"></textarea>
-        </fieldset>
+                    <fieldset class="reader-profile-fieldset">
+                        <legend>Goals</legend>
+                        <div class="input-block">
+                            <label for="reading-goals">Reading goals</label>
+                            <p class="input-hint">Where you want your reading life to go next.</p>
+                            <textarea id="reading-goals" class="input-control" name="reading_goals" rows="2" placeholder="E.g., try more translated fiction, finish a book per month"></textarea>
+                        </div>
+                    </fieldset>
+                </div>
 
-        <!-- Section 2: Preferences -->
-        <fieldset>
-            <legend>Preferences</legend>
-            <label for="themes-to-avoid">Genres to Avoid</label>
-            <textarea id="themes-to-avoid" name="themes_to_avoid" rows="3" placeholder="E.g., horror, dystopian"></textarea>
-        </fieldset>
+                <fieldset class="reader-profile-fieldset">
+                    <legend>Optional</legend>
+                    <div class="input-block">
+                        <label for="mbti">MBTI personality type</label>
+                        <p class="input-hint">Four letters are plenty. We’ll only use this for tone and pacing cues.</p>
+                        <input type="text" id="mbti" name="mbti" maxlength="4" class="input-control" placeholder="E.g., INTJ, ENFP">
+                    </div>
+                </fieldset>
 
-        <!-- Section 4: Goals -->
-        <fieldset>
-            <legend>Goals</legend>
-            <label for="reading-goals">Reading Goals</label>
-            <textarea id="reading-goals" name="reading_goals" rows="3" placeholder="E.g., explore new genres, read more"></textarea>
-        </fieldset>
+                <button type="submit" class="submit-button" id="reader-profile-submit">
+                    <span class="button-text">Generate my profile</span>
+                    <div class="spinner" id="loadingSpinner"></div>
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
 
-        <!-- Section 5: Optional -->
-        <fieldset>
-            <legend>Optional</legend>
-            <label for="mbti">MBTI Personality Type</label>
-            <input type="text" id="mbti" name="mbti" maxlength="4" placeholder="E.g., INTJ, ENFP">
-        </fieldset>
+<script>
+    const form = document.querySelector('.reader-profile-form-body');
+    const spinner = document.getElementById('loadingSpinner');
+    const button = document.getElementById('reader-profile-submit');
 
-        <button type="submit">Generate My Profile</button>
-    </form>
-</div>
-
-    <script>
-    const form = document.querySelector("form");
-    const spinner = document.getElementById("loadingSpinner");
-
-    form.addEventListener("submit", () => {
-        spinner.style.display = "block"; // Show the spinner
-        loadingText.style.display = "block"; // Show the loading text
-    });
-    </script>
+    if (form && spinner && button) {
+        form.addEventListener('submit', () => {
+            button.classList.add('loading');
+        });
+    }
+</script>
 {% endblock %}

@@ -101,9 +101,20 @@ def get_reader_profile_recommendations(reader_profile_details, client):
     raw = response.text.strip()
     logging.debug(f"Raw Gemini response:\n{raw}")
 
+    # Normalize the response to just the JSON payload before parsing
+    clean_response = re.sub(r"```(?:json)?", "", raw).strip()
+
     try:
-        clean_response = re.sub(r"```(?:json)?", "", raw).strip()
         return json.loads(clean_response)
-    except Exception as e:
-        logging.error(f"Failed to parse Gemini JSON: {e}\nRaw response: {raw}")
+    except Exception:
+        # Some responses include extra prose; attempt to extract the first JSON object
+        match = re.search(r"\{.*\}\s*$", clean_response, re.DOTALL)
+        if match:
+            try:
+                return json.loads(match.group(0))
+            except Exception:
+                logging.error(
+                    "Failed to parse extracted Gemini JSON. Raw response kept for debugging.")
+
+        logging.error(f"Failed to parse Gemini JSON. Raw response: {raw}")
         return {}
