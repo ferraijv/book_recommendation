@@ -23,7 +23,7 @@ def create_prompt(obscurity_level, user_input):
 def get_book_recommendations(user_profile, client):
     # Call ChatGPT for book recommendations
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-5-nano",
         messages=[
             {
                 "role": "system",
@@ -77,7 +77,7 @@ def get_reader_profile_recommendations(reader_profile_details, client):
         prompt = create_reader_profile_prompt(reader_profile_details)
             # Call the ChatGPT API
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-5-nano",
             messages=[
                 {"role": "system", "content": """You are an assistant generating personalized reader profiles based on user inputs. Analyze the given responses and create a **reader personality type** tailored to the user. Return the results in the following structured JSON format:
                                                 {
@@ -177,7 +177,7 @@ def get_reader_profile_suggestions(reader_profile, client):
     
     try:
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-5-nano",
             messages=[{"role": "user", "content": prompt}],
         )
         recommendations = response.choices[0].message.content.strip()
